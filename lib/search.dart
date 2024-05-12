@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-
+import 'workerPageFromCustomer.dart';
 class SearchPage extends StatefulWidget {
   final List<dynamic>? services_id;
 
@@ -79,10 +79,12 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    selectedServiceIds=widget.services_id!;
-    searchWorker("", selectedServiceIds);
-
-
+    if (widget.services_id != null) {
+      selectedServiceIds = widget.services_id!;
+      searchWorker("", selectedServiceIds);
+    }else{
+      searchWorker("", selectedServiceIds);
+    }
     getServices();
   }
 
@@ -92,7 +94,9 @@ class _SearchPageState extends State<SearchPage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: isFirstResponseDone ? Column(
+      body:
+      isFirstResponseDone ?
+      Column(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(15.0),
@@ -162,12 +166,11 @@ class _SearchPageState extends State<SearchPage> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    // Handle worker tap
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) =>WorkerPageByOthers(id:int.parse(worker[index]['id']) ,) ,));
                   },
                   child: Padding(
                     padding: EdgeInsets.only(left: 5, bottom: 2),
                     child: Container(
-
                       height: screenHeight / 11,
                       child: Row(
                         children: [
@@ -203,9 +206,10 @@ class _SearchPageState extends State<SearchPage> {
                 );
               },
             ),
-          )
+          ),
         ],
-      ) :Center(
+      )
+          :Center(
             child: LoadingAnimationWidget.inkDrop(
                 color: Colors.blueAccent,
                 size: ((screenWidth / 15) + (screenHeight / 15)))),

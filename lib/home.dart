@@ -64,48 +64,53 @@ class _HomeState extends State<Home> {
       isLoggedIn ? (acc_type=='customer'? CustomerProfile() : WorkerProfile()) : LoginOrSignup(),
     ];
 
-    return Scaffold(
-        body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
-        bottomNavigationBar: ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            child: BottomNavigationBar(
-              items: <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Image.asset('assets/home.png', height: 24, width: 24),
-                  label: ('Home'),
-                  tooltip: ('Home'),
-                  // backgroundColor: Color(0xFFE2E2E2)
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset('assets/search.png', height: 24, width: 24),
-                  label: ('Search'),
-                  tooltip: ('Search'),
-                  backgroundColor: Colors.white,
-                ),
-                BottomNavigationBarItem(
-                  icon: Image.asset('assets/chat.png', width: 24, height: 24),
-                  label: ('Chat'),
-                  tooltip: ('Chat'),
-                  backgroundColor: Colors.white,
-                ),
-                BottomNavigationBarItem(
-                  icon:
-                      Image.asset('assets/profile.png', width: 24, height: 24),
-                  label: ('Profile'),
-                  tooltip: ('Profile'),
-                  backgroundColor: Colors.white,
-                ),
-              ],
-              type: BottomNavigationBarType.shifting,
-              currentIndex: _selectedIndex,
-              selectedItemColor: Colors.black,
-              iconSize: 24,
-              elevation: 5,
-              onTap: _onItemTapped,
-            )));
+    return
+      MaterialApp(
+        home:
+          Scaffold(
+              body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
+              bottomNavigationBar: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  child: BottomNavigationBar(
+                    items: <BottomNavigationBarItem>[
+                      BottomNavigationBarItem(
+                        icon: Image.asset('assets/home.png', height: 24, width: 24),
+                        label: ('Home'),
+                        tooltip: ('Home'),
+                        // backgroundColor: Color(0xFFE2E2E2)
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Image.asset('assets/search.png', height: 24, width: 24),
+                        label: ('Search'),
+                        tooltip: ('Search'),
+                        backgroundColor: Colors.white,
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Image.asset('assets/chat.png', width: 24, height: 24),
+                        label: ('Chat'),
+                        tooltip: ('Chat'),
+                        backgroundColor: Colors.white,
+                      ),
+                      BottomNavigationBarItem(
+                        icon:
+                        Image.asset('assets/profile.png', width: 24, height: 24),
+                        label: ('Profile'),
+                        tooltip: ('Profile'),
+                        backgroundColor: Colors.white,
+                      ),
+                    ],
+                    type: BottomNavigationBarType.shifting,
+                    currentIndex: _selectedIndex,
+                    selectedItemColor: Colors.black,
+                    iconSize: 24,
+                    elevation: 5,
+                    onTap: _onItemTapped,
+                  )))
+      );
+
   }
 }
 

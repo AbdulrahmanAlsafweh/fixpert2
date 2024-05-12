@@ -40,6 +40,7 @@ class _LoginState extends State<Login> {
           sp.setString('username',responseData['username']);
           sp.setString('address',responseData['address']);
           sp.setString('acc_type', responseData['acc_type']);
+          sp.setString("profile_pic",responseData['profile_pic']);
           sp.setBool("loggedIn", true);
           if(responseData['acc_type'] == 'worker'){
             sp.setInt('availability',int.parse(responseData['availability']));

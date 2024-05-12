@@ -36,10 +36,12 @@ dependencies:
   loading_animation_widget:
   image_picker: ^0.8.4+2
   http: ^0.13.4
+  animated_rating_stars: ^1.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
+  introduction_screen: ^3.1.14
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +71,9 @@ flutter:
     - assets/upload.png
     - assets/homedesign.jpg
     - assets/homeLogo.png
+    - assets/focus.png
+    - assets/superman.png
+    - assets/workers.png
 #    - assets/homeDesign.png
 
   # The following line ensures that the Material Icons font is
