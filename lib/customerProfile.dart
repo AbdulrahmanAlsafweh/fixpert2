@@ -33,6 +33,7 @@ class _CustomerProfileState extends State<CustomerProfile> {
   Future<void> logout() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     sp.setBool('loggedIn', false);
+    sp.setString('acc_type ', "");
     print(sp.getBool("loggedIn"));
   }
 
@@ -116,7 +117,7 @@ class _CustomerProfileState extends State<CustomerProfile> {
       home: Scaffold(
 
           body:
-          loading  ?
+          // loading  ?
 
           SliderDrawer(
             isDraggable: true,
@@ -283,10 +284,10 @@ class _CustomerProfileState extends State<CustomerProfile> {
           ],
         ),
       )
-              :Center(
-            child: LoadingAnimationWidget.inkDrop(
-                color: Colors.blueAccent,
-                size: ((screenWidth / 15) + (screenHeight / 15))))
+            //   :Center(
+            // child: LoadingAnimationWidget.inkDrop(
+            //     color: Colors.blueAccent,
+            //     size: ((screenWidth / 15) + (screenHeight / 15))))
     ),
     );
   }

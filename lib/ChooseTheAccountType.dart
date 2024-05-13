@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'signup.dart';
 import 'login.dart';
 import 'signup.dart';
@@ -6,6 +7,10 @@ import 'availability.dart';
 class ChooseAcountType extends StatelessWidget {
   const ChooseAcountType({super.key});
 
+  Future<void> setAccType(String acc_type) async{
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    sp.setString("acc_type", acc_type);
+  }
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -28,6 +33,8 @@ class ChooseAcountType extends StatelessWidget {
             child: GestureDetector(
 
               onTap: () {
+                setAccType('worker');
+
                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Signup(accType: "worker",),));
               },
               child: Image.asset('assets/imworker.png',width: screenWidth,),
@@ -38,6 +45,8 @@ class ChooseAcountType extends StatelessWidget {
             child: GestureDetector(
 
               onTap: () {
+                setAccType('client');
+
                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Signup(accType: 'client',),));
               },
               child: Image.asset('assets/imclient.png',width: screenWidth,),

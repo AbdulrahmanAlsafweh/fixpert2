@@ -4,8 +4,7 @@ import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'workerPageFromCustomer.dart';
 class SearchPage extends StatefulWidget {
-  final List<dynamic>? services_id;
-
+  final List<int>? services_id;
   const SearchPage({Key? key, this.services_id}) : super(key: key);
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -60,10 +59,17 @@ class _SearchPageState extends State<SearchPage> {
           setState(() {
             services.clear();
             services = servicesData.map((service) {
+
               service['toggled'] = false;
+              if(selectedServiceIds.contains(int.parse(service['id']))){
+                print("true");
+                        service['toggled'] = true ;
+              }
               return service;
             }).toList();
+
           });
+          print("service $services");
         } else {
           // Handle the case when servicesData is null
           print('Error: servicesData is null');
@@ -82,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
     if (widget.services_id != null) {
       selectedServiceIds = widget.services_id!;
       searchWorker("", selectedServiceIds);
-    }else{
+    } else {
       searchWorker("", selectedServiceIds);
     }
     getServices();
@@ -140,7 +146,7 @@ class _SearchPageState extends State<SearchPage> {
                     margin: EdgeInsets.all(5),
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: services[index]['toggled'] ? Colors.grey[400] : Colors.grey[200],                      borderRadius: BorderRadius.circular(20),
+                      color: services[index]['toggled'] ? Colors.grey[400] : Colors.grey[200],borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       children: <Widget> [
@@ -166,6 +172,7 @@ class _SearchPageState extends State<SearchPage> {
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) =>WorkerPageByOthers(id:int.parse(worker[index]['id']) ,) ,));
                   },
                   child: Padding(

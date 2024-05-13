@@ -83,6 +83,7 @@ class Signup extends StatelessWidget {
             }
             print('signup done');
             // Navigate to the home page to trigger rebuild
+            Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => Home()),
@@ -129,7 +130,9 @@ class Signup extends StatelessWidget {
                   duration: Duration(seconds: 3),
                   backgroundColor: Colors.red,
                 ))
-              : Navigator.of(context).pushReplacement(MaterialPageRoute(
+              :
+
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => Services(
                     email: email,
                     password: password,

@@ -10,7 +10,9 @@ import 'search.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'workerProfile.dart';
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  // int? neededPage;
+  // List<int>? selectedId;
+  Home({Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -32,18 +34,27 @@ class _HomeState extends State<Home> {
     setState(() {
       isLoggedIn = sp.getBool('loggedIn') ?? false;
       print('hellomister');
-      acc_type=sp.getString('acc_type')!;
+      acc_type=sp.getString('acc_type') ?? "";
       print("Account type is $acc_type");
       print(isLoggedIn);
     });
   }
 
+
   @override
   void initState() {
-    // super.initState();
+    super.initState();
+    // if(
+    // !widget.neededPage!.isNaN
+    // ){
+    //   _selectedIndex = widget.neededPage ?? 0;
+    // }
     loadData();
+
     print(isLoggedIn);
   }
+
+
 
   // void updateLoggedInStatus(bool status) {
   //   setState(() {
@@ -53,17 +64,19 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     // the list to disply the selected widget
+
     List<Widget> _widgetOptions = [
       // first item
       HomePage(),
       // second item
+      // widget.selectedId!.isNotEmpty ?
+      // SearchPage(services_id: widget.selectedId,) :
       SearchPage(),
       // third item
       isLoggedIn? Text('Chat Page',style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)): LoginOrSignup(),
       // fourth item
       isLoggedIn ? (acc_type=='customer'? CustomerProfile() : WorkerProfile()) : LoginOrSignup(),
     ];
-
     return
       MaterialApp(
         home:

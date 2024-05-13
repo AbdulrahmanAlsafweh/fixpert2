@@ -35,6 +35,7 @@ class _WorkerProfileState extends State<WorkerProfile> {
   Future<void> logout() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     sp.setBool('loggedIn', false);
+    sp.setString('acc_type ', "");
     print(sp.getBool("loggedIn"));
   }
 
@@ -136,8 +137,9 @@ class _WorkerProfileState extends State<WorkerProfile> {
 
     return MaterialApp(
       home: Scaffold(
-          body: loading
-              ? SliderDrawer(
+          body:
+          // loading              ?
+          SliderDrawer(
                   isDraggable: true,
                   slideDirection: SlideDirection.RIGHT_TO_LEFT,
                   appBar: SliderAppBar(
@@ -361,10 +363,11 @@ class _WorkerProfileState extends State<WorkerProfile> {
                     ],
                   ),
                 )
-              : Center(
-                  child: LoadingAnimationWidget.inkDrop(
-                      color: Colors.blueAccent,
-                      size: ((screenWidth / 15) + (screenHeight / 15))))),
+              // : Center(
+              //     child: LoadingAnimationWidget.inkDrop(
+              //         color: Colors.blueAccent,
+              //         size: ((screenWidth / 15) + (screenHeight / 15))))
+                                ),
     );
   }
 }

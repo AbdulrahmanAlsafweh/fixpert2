@@ -42,6 +42,7 @@ class _ServicesState extends State<Services> {
   }
 // this function will insert new worker
   Future<void> signup() async {
+
     SharedPreferences sp = await SharedPreferences.getInstance();
     String baseURL = 'https://switch.unotelecom.com/fixpert/newWorker.php';
     String email=widget.email!;
@@ -73,6 +74,7 @@ class _ServicesState extends State<Services> {
 
           }
         // Navigate to the home page to trigger rebuild
+        Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Availability(user_id: responseData['user_id'],)),
@@ -90,7 +92,16 @@ class _ServicesState extends State<Services> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+
+      Scaffold(
+      floatingActionButton:FloatingActionButton(
+        child: Icon(Icons.done),
+        onPressed:  () {
+          signup();
+          print('Selected service: $selectedService');
+        },
+      ),
       appBar: AppBar(
         title: Text('Services'),
       ),
@@ -138,23 +149,31 @@ class _ServicesState extends State<Services> {
               },
             ),
           ),
-          Visibility(
-            visible: isServiceSelected,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  signup();
-                  // Use selectedService here
-                  print('Selected service: $selectedService');
-                },
-                child: Text('Continue'),
-              ),
-            ),
-          ),
+          // Visibility(
+          //   visible: isServiceSelected,
+            // child: Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: ElevatedButton(
+            //     style: ButtonStyle(
+            //
+            //     ),
+            //     onPressed: () {
+            //
+            //     },
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: [
+            //         Text('continue'),
+            //         SizedBox(width: 5,)
+            //         ,Icon(Icons.arrow_forward_ios)
+            //       ],
+            //     ),
+            //   ),
+            // ),
+          // ),
         ],
       ),
-    );
+      );
   }
 }
 

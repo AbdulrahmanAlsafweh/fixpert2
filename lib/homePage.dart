@@ -1,3 +1,4 @@
+import 'package:fixpert/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -25,8 +26,9 @@ Future<void> getServices() async {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    super.initState();
     getServices();
+    super.initState();
+
   }
 
   @override
@@ -141,8 +143,8 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ) ,
                       onTap: () {
-                        List<String> idOfServices=[services[index]['id']];
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => SearchPage(services_id: idOfServices,),));
+                        List<int> idOfServices=[int.parse(services[index]['id'])];
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) =>SearchPage(services_id: idOfServices ,),));
                       },
                     ) ;
                   },
