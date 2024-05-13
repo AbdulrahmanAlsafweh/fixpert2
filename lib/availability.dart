@@ -1,3 +1,4 @@
+import 'package:fixpert/chooseLocation.php.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,7 +86,7 @@ class _AvailabilityState extends State<Availability> {
               child:   ElevatedButton(onPressed:() {
                 updateAvailability(1);
                 Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home(),));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChooseLocationPage(),));
               },
                 child:
                 Row(

@@ -48,6 +48,7 @@ class _LoginState extends State<Login> {
             sp.setString('about', responseData['about']);
             sp.setString('profile_pic',responseData['profile_pic']);
           }
+          Navigator.of(context).popUntil((route) => route.isFirst);
           Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home(),));
         }
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

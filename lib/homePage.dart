@@ -144,6 +144,7 @@ class _HomePageState extends State<HomePage> {
                       ) ,
                       onTap: () {
                         List<int> idOfServices=[int.parse(services[index]['id'])];
+                        // Navigator.of(context).popUntil((route) => route.isFirst);
                             Navigator.of(context).push(MaterialPageRoute(builder: (context) =>SearchPage(services_id: idOfServices ,),));
                       },
                     ) ;

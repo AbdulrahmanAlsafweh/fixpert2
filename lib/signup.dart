@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'login.dart';
 import 'home.dart';
 import 'getServices.dart';
-
+import 'chooseLocation.php.dart';
 class Signup extends StatelessWidget {
   final String? accType;
 
@@ -86,7 +86,7 @@ class Signup extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => Home()),
+              MaterialPageRoute(builder: (context) => ChooseLocationPage()),
             );
           } else {
             sp.setBool("loggedIn", false);
