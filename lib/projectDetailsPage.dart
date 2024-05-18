@@ -59,7 +59,7 @@ class ProjectDetailsPage extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: "https://switch.unotelecom.com/fixpert/assets/worker_projects/${images[index]}",
                     placeholder: (context, url) => Center(
-                      child: LoadingAnimationWidget.staggeredDotsWave(
+                      child: LoadingAnimationWidget.prograssiveDots(
                         color: Colors.blueAccent,
                         size: 50,
                       ),

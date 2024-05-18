@@ -105,7 +105,7 @@ class _SelectCategoryState extends State<SelectCategory> {
                                 child: CachedNetworkImage(
                                   imageUrl: "https://switch.unotelecom.com/fixpert/assets/services_image/${filteredServices[index]['image_uri']}",
                                   placeholder: (context, url) => LoadingAnimationWidget
-                                      .staggeredDotsWave(
+                                      .prograssiveDots(
                                     color: Colors.blueAccent,
                                     size: 50,
                                   ), // Loading indicator

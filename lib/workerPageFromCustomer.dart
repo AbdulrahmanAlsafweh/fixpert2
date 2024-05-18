@@ -35,8 +35,14 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
   String? about;
   String? availability;
   String? acc_type = '';
+  Map<String, List<String>> projectsWithImages = {};
+  List<dynamic> workerComments = [];
 
   Future<void> getWorkerProfileInfo(int? id) async {
+    setState(() {
+      loading = true;
+    });
+
     String url = "$baseUrl?worker_id=$id";
     print("fetching $url");
     final request = await http.get(Uri.parse(url));
@@ -61,7 +67,20 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
     }
   }
 
-  Map<String, List<String>> projectsWithImages = {};
+  Future<void> getWorkerComments(int? id) async {
+    String url =
+        "https://switch.unotelecom.com/fixpert/getComments.php?worker_id=$id";
+    print("fetching $url");
+    final request = await http.get(Uri.parse(url));
+    if (request.statusCode == 200) {
+      setState(() {
+        workerComments = jsonDecode(request.body);
+      });
+      print("workerComments: $workerComments");
+    } else {
+      print("Request failed");
+    }
+  }
 
   Future<void> getWorkerProjects(int? id) async {
     String url =
@@ -72,7 +91,8 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
       List<dynamic> result = jsonDecode(request.body);
       setState(() {
         workerProjects = result;
-        workerProjects.forEach((project) {
+        projectsWithImages.clear();  // Clear existing data
+        for (var project in workerProjects) {
           String projectName = project['project_name'];
           String image = project['image'];
 
@@ -81,14 +101,9 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
           } else {
             projectsWithImages[projectName] = [image];
           }
-        });
+        }
         print("projects are $workerProjects");
         print("new  shi $projectsWithImages");
-        projectsWithImages.forEach((project, images) {
-          print('Project: $project');
-          print('Images: $images');
-          print('\n');
-        });
       });
     } else {
       print("Request failed");
@@ -99,11 +114,9 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
   void initState() {
     super.initState();
     print('initState called');
-    setState(() {
-      loading = true;
-    });
     getWorkerProfileInfo(widget.id);
     getWorkerProjects(widget.id);
+    getWorkerComments(widget.id);
     SharedPreferences.getInstance().then((sp) {
       setState(() {
         loggedIn = sp.getBool('loggedIn') ?? false;
@@ -148,7 +161,8 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
               padding: EdgeInsets.only(left: 10),
               child: Text(
                 '$workerName',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+                style: TextStyle(
+                    fontWeight: FontWeight.w800, fontSize: 24),
               ),
             ),
             Padding(
@@ -184,7 +198,8 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
               padding: EdgeInsets.only(left: 10),
               child: Text(
                 "About",
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                style:
+                TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
               ),
             ),
             SizedBox(height: 3),
@@ -197,53 +212,11 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
             ),
             SizedBox(height: 10),
             Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                "Reviews",
-                style: TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: RatingBar.builder(
-                initialRating: widget.rate ?? 0,
-                minRating: 1,
-                direction: Axis.horizontal,
-                itemSize: 20,
-                maxRating: 5,
-                allowHalfRating: true,
-                itemCount: 5,
-                ignoreGestures: true,
-                itemPadding: EdgeInsets.symmetric(horizontal: 0.0),
-                itemBuilder: (context, _) => Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (rating) {},
-              ),
-            ),
-            acc_type!.contains('worker')
-                ? SizedBox()
-                : TextButton(
-                onPressed: () {
-                  if (loggedIn ?? false) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => WriteReviewPage(
-                        worker_id: widget.id,
-                      ),
-                    ));
-                  } else {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => Home(neededPage: 3),
-                    ));
-                  }
-                },
-                child: Text("Write a review")),
-            Padding(
               padding: EdgeInsets.all(10),
               child: Text(
                 "Projects",
-                style: TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
+                style:
+                TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
               ),
             ),
             Padding(
@@ -290,13 +263,14 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                                 child: CachedNetworkImage(
                                   imageUrl:
                                   "https://switch.unotelecom.com/fixpert/assets/worker_projects/${images[0]}",
-                                  placeholder: (context, url) => Center(
-                                    child: LoadingAnimationWidget
-                                        .staggeredDotsWave(
-                                      color: Colors.blueAccent,
-                                      size: 50,
-                                    ),
-                                  ),
+                                  placeholder: (context, url) =>
+                                      Center(
+                                        child: LoadingAnimationWidget
+                                            .prograssiveDots(
+                                          color: Colors.blueAccent,
+                                          size: 50,
+                                        ),
+                                      ),
                                   errorWidget: (context, url, error) =>
                                       Icon(
                                         Icons.error,
@@ -351,6 +325,96 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                           ),
                         ],
                       ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                "Reviews",
+                style:
+                TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: RatingBar.builder(
+                initialRating: widget.rate ?? 0,
+                minRating: 1,
+                direction: Axis.horizontal,
+                itemSize: 20,
+                maxRating: 5,
+                allowHalfRating: true,
+                itemCount: 5,
+                ignoreGestures: true,
+                itemPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {},
+              ),
+            ),
+            acc_type!.contains('worker')
+                ? SizedBox()
+                : TextButton(
+                onPressed: () {
+                  if (loggedIn ?? false) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => WriteReviewPage(
+                        worker_id: widget.id,
+                      ),
+                    ));
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => Home(neededPage: 3),
+                    ));
+                  }
+                },
+                child: Text("Write a review")),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: workerComments.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: EdgeInsets.all(10),
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          workerComments[index]['username'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(workerComments[index]['comment']),
+                        SizedBox(height: 5),
+                        RatingBar.builder(
+                          initialRating:
+                          workerComments[index]['rate'].toDouble(),
+                          minRating: 1,
+                          direction: Axis.horizontal,
+                          itemSize: 16,
+                          allowHalfRating: true,
+                          ignoreGestures: true,
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                          onRatingUpdate: (rating) {},
+                        ),
+                      ],
                     ),
                   );
                 },

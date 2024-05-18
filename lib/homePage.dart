@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                         LoadingAnimationWidget
-                            .staggeredDotsWave(
+                            .prograssiveDots(
                           color: Colors.blueAccent,
                           size: 50,
                         ),
@@ -159,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                                 child: CachedNetworkImage(
                                   imageUrl: "https://switch.unotelecom.com/fixpert/assets/services_image/${services[index]['image_uri']}",
                                   placeholder: (context, url) => LoadingAnimationWidget
-                                      .staggeredDotsWave(
+                                      .prograssiveDots(
                   color: Colors.blueAccent,
                   size: 50,
                   ),
