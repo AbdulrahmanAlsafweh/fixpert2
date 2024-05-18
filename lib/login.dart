@@ -1,3 +1,4 @@
+import 'package:fixpert/homePage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'home.dart';
@@ -5,8 +6,10 @@ import 'dart:convert';
 import 'ChooseTheAccountType.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'signup.dart';
-
+import 'home.dart';
 class Login extends StatefulWidget {
+
+
   const Login({super.key});
 
   @override
@@ -71,6 +74,7 @@ class _LoginState extends State<Login> {
           ,duration: Duration(seconds: 3),
           backgroundColor: Colors.red));
     }
+
     // }
   }
 

@@ -9,15 +9,15 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'changePassword.dart';
 import 'editWorkerProfile.dart';
 import 'addNewWorkerProject.dart';
+
 class WorkerProfile extends StatefulWidget {
-  const WorkerProfile({super.key});
+  const WorkerProfile({Key? key}) : super(key: key);
 
   @override
   State<WorkerProfile> createState() => _WorkerProfileState();
 }
 
 class _WorkerProfileState extends State<WorkerProfile> {
-  // Variables
   bool loading = false;
   String baseUrl =
       'https://switch.unotelecom.com/fixpert/getWorkerProfileInfo.php';
@@ -30,8 +30,6 @@ class _WorkerProfileState extends State<WorkerProfile> {
   int availability = 0;
   String about = '';
 
-// Functions
-// logout func
   Future<void> logout() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     sp.setBool('loggedIn', false);
@@ -39,15 +37,12 @@ class _WorkerProfileState extends State<WorkerProfile> {
     print(sp.getBool("loggedIn"));
   }
 
-// fetch the inital data
-
   Future<void> fetchData() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     id = sp.getString("user_id") ?? '';
-    print('User ID: $id'); // Check if user ID is retrieved correctly
+    print('User ID: $id');
 
     if (id.isNotEmpty) {
-      // Check if user ID is not empty
       String url = '$baseUrl?worker_id=$id';
       print('Fetching data from URL: $url');
 
@@ -80,11 +75,10 @@ class _WorkerProfileState extends State<WorkerProfile> {
     loading = true;
   }
 
-  // The logout dialog
   Future<void> _showLogoutConfirmationDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
@@ -135,239 +129,172 @@ class _WorkerProfileState extends State<WorkerProfile> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return MaterialApp(
-      home: Scaffold(
-          body:
-          // loading              ?
-          SliderDrawer(
-                  isDraggable: true,
-                  slideDirection: SlideDirection.RIGHT_TO_LEFT,
-                  appBar: SliderAppBar(
-                      appBarColor: Colors.white,
-                      title: Text('worker page',
-                          style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w700))),
-                  slider: Scaffold(
-                    appBar: AppBar(),
-                    body: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        //     Container(
-                        //       padding:EdgeInsets.only(left: 10),
-                        // child: Image.network("https://switch.unotelecom.com/fixpert/assets/$picUri",width: screenWidth/5,),),
-                        SizedBox(
-                          height: 15,
+    return Scaffold(
+      body: loading
+          ? SliderDrawer(
+              isDraggable: true,
+              slideDirection: SlideDirection.RIGHT_TO_LEFT,
+              appBar: SliderAppBar(
+                  appBarColor: Colors.white,
+                  title: Text('Worker Page',
+                      style: const TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.w700))),
+              slider: Scaffold(
+                appBar: AppBar(),
+                body: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(height: 15),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ChangePasswordpage()));
+                      },
+                      child: ListTile(
+                        leading: Icon(Icons.key, size: 32),
+                        title: Text(
+                          "Change Your Password",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 18),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ChangePasswordpage()));
-                          },
-                          child: Container(
-                            child: Row(
-                              children: <Widget>[
-                                Icon(Icons.key, size: 32),
-                                SizedBox(width: 10),
-                                Text(
-                                  "Change Your Password",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(
-                          height: 15,
-                        ),
-                        GestureDetector(
-                          onTap: _showLogoutConfirmationDialog,
-                          child: Container(
-                            child: Row(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.logout_outlined,
-                                  size: 32,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  "Logout",
-                                  style: TextStyle(
-                                      color: Colors.red, fontSize: 18),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // SizedBox(
-                      //   height: screenHeight / 20,
-                      // ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: CircleAvatar(
-                              radius:
-                                  screenWidth / 7, // Adjust radius as needed
-                              backgroundImage: NetworkImage(
-                                "https://switch.unotelecom.com/fixpert/assets/$picUri",
-                              ),
-                            ),
+                    GestureDetector(
+                      onTap: _showLogoutConfirmationDialog,
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.logout_outlined,
+                          size: 32,
+                          color: Colors.red,
+                        ),
+                        title: Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.red, fontSize: 18),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: CircleAvatar(
+                          radius: screenWidth / 7,
+                          backgroundImage: NetworkImage(
+                            "https://switch.unotelecom.com/fixpert/assets/$picUri",
                           ),
-                          Spacer(),
-                          // Padding(
-                          //   padding: EdgeInsets.only(right: 4, bottom: 20),
-                          //   child: IconButton(
-                          //       onPressed: () {},
-                          //       icon: Icon(
-                          //         Icons.menu,
-                          //         size: screenWidth / 10,
-                          //       )),
-                          // )
-                        ],
-                      ),
-
-                      SizedBox(
-                        height: 15,
-                      ),
-
-                      // Username is here
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text(
-                          '$username',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w800, fontSize: 24),
                         ),
                       ),
-
-                      SizedBox(
-                        height: 5,
-                      ),
-                      // address of the user is here
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text(
-                          address,
-                          style: TextStyle(
-                              color: Colors.grey, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text(
-                          'Open Time: $open_time',
-                          style: TextStyle(
-                              color: Colors.grey, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-
-                      // The Edit profile button
-                      Padding(
-                        padding: EdgeInsets.only(left: 10, right: 10),
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.blueAccent),
-                              shape: MaterialStatePropertyAll(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10)))),
-                          child: Row(
-                            children: [
-                              Spacer(),
-                              Text(
-                                'Edit Your Profile',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                              ),
-                              Spacer()
-                            ],
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => EditWorkerProfile(),
-                                settings: RouteSettings(arguments: {
-                                  'uri':
-                                      "https://switch.unotelecom.com/fixpert/assets/$picUri",
-                                  'username': username,
-                                  'user_id': id,
-                                })));
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text(
-                          "About",
-                          style: (TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 18)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text(
-                          about,
-                          style: TextStyle(),
-                        ),
-                      ),
-
-                      Expanded(
-                          child: Container(
-                        child: ElevatedButton(
-                          onPressed:  () {
-                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddNewWorkerProject(worker_id:id ,),));
-                          },
-                          child: Text('Add New Project'),
-                        ),
-                      ))
-                      // ElevatedButton(
-                      //     onPressed: () {
-                      //       // logout()
-                      //       Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      //         builder: (context) => Home(),
-                      //       ));
-                      //       setState(() {
-                      //         logout();
-                      //       });
-                      //     },
-                      //     child: Text("Logout")),
+                      Spacer(),
                     ],
                   ),
-                )
-              // : Center(
-              //     child: LoadingAnimationWidget.inkDrop(
-              //         color: Colors.blueAccent,
-              //         size: ((screenWidth / 15) + (screenHeight / 15))))
-                                ),
+                  SizedBox(height: 15),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      '$username',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      address,
+                      style: TextStyle(
+                          color: Colors.grey, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      'Open Time: $open_time',
+                      style: TextStyle(
+                          color: Colors.grey, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.blueAccent),
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)))),
+                      child: Row(
+                        children: [
+                          Spacer(),
+                          Text(
+                            'Edit Your Profile',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(width: 5),
+                          Icon(Icons.edit, color: Colors.white),
+                          Spacer()
+                        ],
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => EditWorkerProfile(),
+                            settings: RouteSettings(arguments: {
+                              'uri':
+                                  "https://switch.unotelecom.com/fixpert/assets/$picUri",
+                              'username': username,
+                              'user_id': id,
+                            })));
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      "About",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      about,
+                      style: TextStyle(),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.bottomCenter,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                AddNewWorkerProject(worker_id: id),
+                          ));
+                        },
+                        child: Text('Add New Project'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : Center(
+              child: LoadingAnimationWidget.inkDrop(
+                  color: Colors.blueAccent,
+                  size: ((screenWidth / 15) + (screenHeight / 15)))),
     );
   }
 }

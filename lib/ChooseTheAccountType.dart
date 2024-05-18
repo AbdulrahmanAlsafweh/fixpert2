@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'signup.dart';
-import 'login.dart';
-import 'signup.dart';
-import 'availability.dart';
+
 class ChooseAcountType extends StatelessWidget {
-  const ChooseAcountType({super.key});
+  final VoidCallback? loadDataCallback;
+  const ChooseAcountType({Key? key,  this.loadDataCallback}) : super(key: key);
 
   Future<void> setAccType(String acc_type) async{
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -34,7 +33,7 @@ class ChooseAcountType extends StatelessWidget {
 
               onTap: () {
                 setAccType('worker');
-
+                loadDataCallback!();
                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Signup(accType: "worker",),));
               },
               child: Image.asset('assets/imworker.png',width: screenWidth,),
@@ -46,7 +45,7 @@ class ChooseAcountType extends StatelessWidget {
 
               onTap: () {
                 setAccType('client');
-
+                  loadDataCallback!();
                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Signup(accType: 'client',),));
               },
               child: Image.asset('assets/imclient.png',width: screenWidth,),

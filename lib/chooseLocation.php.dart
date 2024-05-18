@@ -16,6 +16,7 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
   String acc_type = '';
   String user_id = '' ;
   String selectedLocation ='' ;
+  bool loading = false;
   int? id ;
   String baseUrl='https://switch.unotelecom.com/fixpert/updateLocation.php';
   TextEditingController searchTextController = TextEditingController();
@@ -35,6 +36,7 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
   }
   Future<void> updateLocation() async{
     String url ="$baseUrl?user_id=$user_id&acc_type=$acc_type&address=$selectedLocation";
+    print("fetching $url");
     final request = await http.get(Uri.parse(url));
     if (request.statusCode == 200){
       String message = jsonDecode(request.body);
@@ -42,17 +44,25 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
     }
   }
   Future<void> fetchLocations() async {
+    setState(() {
+      loading = false;
+    });
     String url = 'https://switch.unotelecom.com/fixpert/assets/lib.json';
+
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       setState(() {
         locations = jsonDecode(response.body);
+        loading = true ;
         print(locations);
       });
     }
   }
 
   void filterLocations(String query) {
+    setState(() {
+      loading = false ;
+    });
     List<dynamic> filteredLocations = locations.where((location) {
       String city = location['CITY / VILLAGE'].toString().toLowerCase();
       String district = location['DISTRICT '].toString().toLowerCase();
@@ -65,6 +75,8 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
 
     setState(() {
       locations = filteredLocations;
+
+      loading = true ;
     });
   }
 
@@ -73,9 +85,23 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        child:Icon(Icons.done) ,
+        child: Icon(Icons.done),
         onPressed: () {
-            selectedLocation.isEmpty ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Choose address"),backgroundColor: Colors.red,)) : Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home(),));
+          if (selectedLocation.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Choose address"),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } else {
+            updateLocation();
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => Home(),
+              ),
+            );
+          }
         },
       ),
       appBar: AppBar(
@@ -106,7 +132,7 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
             ),
           ),
 
-
+          loading ?
           Expanded(
             child: Container(
               child: ListView.builder(
@@ -131,7 +157,15 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
                 },
               ),
             ),
-          ),
+          )  : Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+
+              mainAxisAlignment: MainAxisAlignment.center,
+              children:
+
+          [
+            CircularProgressIndicator()
+    ]  )
         ],
       ),
     );

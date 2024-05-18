@@ -12,7 +12,8 @@ import 'workerProfile.dart';
 class Home extends StatefulWidget {
   // int? neededPage;
   // List<int>? selectedId;
-  Home({Key? key}) : super(key: key);
+    int? neededPage;
+  Home({Key? key ,this.neededPage}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -30,6 +31,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> loadData() async {
+    print('hello dear this is load data from home') ;
     SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {
       isLoggedIn = sp.getBool('loggedIn') ?? false;
@@ -43,12 +45,14 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+
     super.initState();
     // if(
     // !widget.neededPage!.isNaN
     // ){
     //   _selectedIndex = widget.neededPage ?? 0;
     // }
+    _selectedIndex = widget.neededPage ?? 0;
     loadData();
 
     print(isLoggedIn);
@@ -73,9 +77,9 @@ class _HomeState extends State<Home> {
       // SearchPage(services_id: widget.selectedId,) :
       SearchPage(),
       // third item
-      isLoggedIn? Text('Chat Page',style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)): LoginOrSignup(),
+      isLoggedIn? Text('Chat Page',style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)): LoginOrSignup(loadDataCallback: loadData,),
       // fourth item
-      isLoggedIn ? (acc_type=='customer'? CustomerProfile() : WorkerProfile()) : LoginOrSignup(),
+      isLoggedIn ? (acc_type=='client' || acc_type=="customer"? CustomerProfile() : WorkerProfile()) : LoginOrSignup(loadDataCallback: loadData,),
     ];
     return
       MaterialApp(
@@ -135,9 +139,10 @@ class _HomeState extends State<Home> {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class LoginOrSignup extends StatelessWidget {
-  const LoginOrSignup({
-    super.key,
-  });
+  final VoidCallback? loadDataCallback;
+  const LoginOrSignup({Key? key,  this.loadDataCallback}) : super(key: key);
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +189,7 @@ class LoginOrSignup extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => ChooseAcountType()));
+                          builder: (context) => ChooseAcountType(loadDataCallback: loadDataCallback,)));
                     },
                     child: Text(
                       ' Signup',

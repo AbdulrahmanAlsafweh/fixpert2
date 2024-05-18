@@ -34,6 +34,7 @@ class _CustomerProfileState extends State<CustomerProfile> {
     SharedPreferences sp = await SharedPreferences.getInstance();
     sp.setBool('loggedIn', false);
     sp.setString('acc_type ', "");
+
     print(sp.getBool("loggedIn"));
   }
 
@@ -117,7 +118,7 @@ class _CustomerProfileState extends State<CustomerProfile> {
       home: Scaffold(
 
           body:
-          // loading  ?
+          loading  ?
 
           SliderDrawer(
             isDraggable: true,
@@ -129,49 +130,38 @@ class _CustomerProfileState extends State<CustomerProfile> {
                     fontSize: 22, fontWeight: FontWeight.w700))),
         slider:Scaffold(
           appBar: AppBar(),
-          body:  Column(
-
-
+          body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:<Widget> [
-
-          //     Container(
-          //       padding:EdgeInsets.only(left: 10),
-          // child: Image.network("https://switch.unotelecom.com/fixpert/assets/$picUri",width: screenWidth/5,),),
-             SizedBox(height: 15,),
+            children: <Widget>[
+              SizedBox(height: 15),
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChangePasswordpage()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ChangePasswordpage()));
                 },
-                child: Container(
-                  child: Row(
-                    children:<Widget> [
-                      Icon(Icons.key, size: 32),
-                      SizedBox(width: 10),
-                      Text(
-                        "Change Your Password",
-                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-                      ),
-                    ],
+                child: ListTile(
+                  leading: Icon(Icons.key, size: 32),
+                  title: Text(
+                    "Change Your Password",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, fontSize: 18),
                   ),
                 ),
               ),
-              
-              SizedBox(height: 15,
-              ),
               GestureDetector(
                 onTap: _showLogoutConfirmationDialog,
-                child: Container(
-
-                  child: Row(children:<Widget> [
-
-                    Icon(Icons.logout_outlined,size: 32,),
-                    SizedBox(width: 10,),
-                    Text("Logout",style: TextStyle(color: Colors.red,fontSize: 18),),
-                  ],),
-                ) ,
+                child: ListTile(
+                  leading: Icon(
+                    Icons.logout_outlined,
+                    size: 32,
+                    color: Colors.red,
+                  ),
+                  title: Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.red, fontSize: 18),
+                  ),
+                ),
               )
-
             ],
           ),
         ),
@@ -284,10 +274,10 @@ class _CustomerProfileState extends State<CustomerProfile> {
           ],
         ),
       )
-            //   :Center(
-            // child: LoadingAnimationWidget.inkDrop(
-            //     color: Colors.blueAccent,
-            //     size: ((screenWidth / 15) + (screenHeight / 15))))
+              :Center(
+            child: LoadingAnimationWidget.inkDrop(
+                color: Colors.blueAccent,
+                size: ((screenWidth / 15) + (screenHeight / 15))))
     ),
     );
   }
