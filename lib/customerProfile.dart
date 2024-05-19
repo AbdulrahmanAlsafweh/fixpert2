@@ -7,6 +7,8 @@ import 'dart:convert';
 import 'home.dart';
 import 'editCustomerProfile.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'chooseLocation.php.dart';
 
 class CustomerProfile extends StatefulWidget {
   const CustomerProfile({Key? key}) : super(key: key);
@@ -17,13 +19,13 @@ class CustomerProfile extends StatefulWidget {
 
 class _CustomerProfileState extends State<CustomerProfile> {
   bool loading = false;
-  String baseUrl =
-      'https://switch.unotelecom.com/fixpert/getCustomerProfileInfo.php';
+  String baseUrl = 'https://switch.unotelecom.com/fixpert/getCustomerProfileInfo.php';
   String username = 'username';
   String email = '';
   String picUri = "";
   String id = '';
   String address = '';
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +35,7 @@ class _CustomerProfileState extends State<CustomerProfile> {
   Future<void> logout() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     sp.setBool('loggedIn', false);
-    sp.setString('acc_type ', "");
+    sp.setString('acc_type', ""); // Removed extra space after 'acc_type'
 
     print(sp.getBool("loggedIn"));
   }
@@ -44,7 +46,10 @@ class _CustomerProfileState extends State<CustomerProfile> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Logout Confirmation',style: TextStyle(color: Colors.red),),
+          title: Text(
+            'Logout Confirmation',
+            style: TextStyle(color: Colors.red),
+          ),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -60,7 +65,10 @@ class _CustomerProfileState extends State<CustomerProfile> {
               },
             ),
             TextButton(
-              child: Text('Logout',style: TextStyle(color: Colors.red),),
+              child: Text(
+                'Logout',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () {
                 logout();
                 Navigator.of(context).popUntil((route) => route.isFirst);
@@ -74,6 +82,7 @@ class _CustomerProfileState extends State<CustomerProfile> {
       },
     );
   }
+
   Future<void> fetchData() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     id = sp.getString("user_id") ?? '';
@@ -116,169 +125,138 @@ class _CustomerProfileState extends State<CustomerProfile> {
     double screenHeight = MediaQuery.of(context).size.height;
     return MaterialApp(
       home: Scaffold(
-
-          body:
-          loading  ?
-
-          SliderDrawer(
-            isDraggable: true,
-        slideDirection: SlideDirection.RIGHT_TO_LEFT,
-        appBar: SliderAppBar(
-            appBarColor: Colors.white,
-            title: Text('Profile',
-                style: const TextStyle(
-                    fontSize: 22, fontWeight: FontWeight.w700))),
-        slider:Scaffold(
-          appBar: AppBar(),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 15),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => ChangePasswordpage()));
-                },
-                child: ListTile(
-                  leading: Icon(Icons.key, size: 32),
-                  title: Text(
-                    "Change Your Password",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500, fontSize: 18),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: _showLogoutConfirmationDialog,
-                child: ListTile(
-                  leading: Icon(
-                    Icons.logout_outlined,
-                    size: 32,
-                    color: Colors.red,
-                  ),
-                  title: Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.red, fontSize: 18),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // SizedBox(
-            //   height: screenHeight / 20,
-            // ),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 10),
-                  child: CircleAvatar(
-                    radius: screenWidth / 7, // Adjust radius as needed
-                    backgroundImage: NetworkImage(
-                      "https://switch.unotelecom.com/fixpert/assets/$picUri",
+        body: loading
+            ? SliderDrawer(
+          isDraggable: true,
+          slideDirection: SlideDirection.RIGHT_TO_LEFT,
+          appBar: SliderAppBar(
+              appBarColor: Colors.white,
+              title: Text('Profile',
+                  style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.w700))),
+          slider: Scaffold(
+            appBar: AppBar(),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                SizedBox(height: 15),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => EditCustomerProfile(),
+                        settings: RouteSettings(arguments: {
+                          'uri':
+                          "https://switch.unotelecom.com/fixpert/assets/$picUri",
+                          'username': username,
+                          'user_id': id,
+                        })));
+                  },
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: CachedNetworkImageProvider(
+                          "https://switch.unotelecom.com/fixpert/assets/$picUri"),
+                    ),
+                    title: Text(
+                      'Edit Profile',
+                      style: TextStyle(color: Colors.black, fontSize: 15),
                     ),
                   ),
                 ),
-                Spacer(),
-                // Padding(
-                //   padding: EdgeInsets.only(right: 4, bottom: 20),
-                //   child: IconButton(
-                //       onPressed: () {},
-                //       icon: Icon(
-                //         Icons.menu,
-                //         size: screenWidth / 10,
-                //       )),
-                // )
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ChangePasswordpage(),
+                    ));
+                  },
+                  child: ListTile(
+                    leading: Icon(Icons.lock, color: Colors.black),
+                    title: Text(
+                      'Change Password',
+                      style: TextStyle(color: Colors.black, fontSize: 15),
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _showLogoutConfirmationDialog();
+                  },
+                  child: ListTile(
+                    leading: Icon(Icons.logout, color: Colors.red),
+                    title: Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.red, fontSize: 15),
+                    ),
+                  ),
+                ),
               ],
             ),
-
-            SizedBox(
-              height: 15,
-            ),
-
-            // Username is here
-            Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                '$username',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
+          ),
+          child: Scaffold(
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: screenHeight * 0.3,
+                    color: Colors.indigoAccent,
+                    child: Column(
+                      children: [
+                        SizedBox(height: 50),
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: CachedNetworkImageProvider(
+                              "https://switch.unotelecom.com/fixpert/assets/$picUri"),
+                        ),
+                        SizedBox(height: 10),
+                        Text(username,
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                        SizedBox(height: 5),
+                        Text(email,
+                            style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Address: $address ',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChooseLocationPage(),
+                                ));
+                              },
+                              icon: Icon(Icons.edit),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            SizedBox(
-              height: 5,
-            ),
-            // address of the user is here
-            Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                address,
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-
-            // The Edit profile button
-            Padding(
-              padding: EdgeInsets.only(left: 10, right: 10),
-              child: ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.blueAccent),
-                    shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)))),
-                child: Row(
-                  children: [
-                    Spacer(),
-                    Text(
-                      'Edit Your Profile',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                    ),
-                    Spacer()
-                  ],
-                ),
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => EditCustomerProfile(),
-                      settings: RouteSettings(arguments: {
-                        'uri':
-                            "https://switch.unotelecom.com/fixpert/assets/$picUri",
-                        'username': username,
-                        'user_id': id,
-                      })));
-                },
-              ),
-            ),
-
-            // ElevatedButton(
-            //     onPressed: () {
-            //       // logout()
-            //       Navigator.of(context).pushReplacement(MaterialPageRoute(
-            //         builder: (context) => Home(),
-            //       ));
-            //       setState(() {
-            //         logout();
-            //       });
-            //     },
-            //     child: Text("Logout")),
-          ],
-        ),
-      )
-              :Center(
+          ),
+        )
+            : Center(
             child: LoadingAnimationWidget.inkDrop(
                 color: Colors.blueAccent,
-                size: ((screenWidth / 15) + (screenHeight / 15))))
-    ),
+                size: ((screenWidth / 15) + (screenHeight / 15)))),
+      ),
     );
   }
 }

@@ -374,7 +374,8 @@ class _WorkerProfileState extends State<WorkerProfile> {
                         onLongPress: () {
                           updateAvailability(availability == 1 ? 0 : 1);
                         },
-                        child: Container(
+                        child:
+                        Container(
                           width: double.infinity,
                           height: screenHeight * 0.3,
                           color: availability == 1 ? Colors.green : Colors.red,

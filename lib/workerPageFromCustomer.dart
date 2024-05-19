@@ -30,10 +30,12 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
   bool? loggedIn;
   String? address;
   String? workerPic;
-  String? openTime;
+  String? open_time;
   String? workerName;
   String? about;
+  String? email;
   String? availability;
+  String? close_time;
   String? acc_type = '';
   Map<String, List<String>> projectsWithImages = {};
   List<dynamic> workerComments = [];
@@ -48,23 +50,39 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
     print("fetching $url");
     final request = await http.get(Uri.parse(url));
     if (request.statusCode == 200) {
-      Map<String, dynamic> result = jsonDecode(request.body);
-      setState(() {
-        workerData = [result];
-        workerName = workerData[0]['username'];
-        openTime = workerData[0]['openTime'];
-        workerPic = workerData[0]['profile_pic'];
-        about = workerData[0]['about'];
-        address = workerData[0]['address'];
-        availability = workerData[0]['availability'];
-        loading = false;
-      });
-      print("workerData: $workerData");
+      if (request.body.isNotEmpty) {
+        try {
+          Map<String, dynamic> result = jsonDecode(request.body);
+          setState(() {
+            workerData = [result];
+            workerName = workerData[0]['username'] ?? "";
+            open_time = workerData[0]['openTime'];
+            workerPic = workerData[0]['profile_pic'];
+            about = workerData[0]['about'];
+            address = workerData[0]['address'];
+            email = workerData[0]['email'];
+            close_time = workerData[0]['closeTime'];
+            availability = workerData[0]['availability'];
+            loading = false;
+          });
+          print("workerData: $workerData");
+        } catch (e) {
+          print("Error parsing JSON: $e");
+          setState(() {
+            loading = false;
+          });
+        }
+      } else {
+        print("Empty response body");
+        setState(() {
+          loading = false;
+        });
+      }
     } else {
       setState(() {
         loading = false;
       });
-      print("Request failed");
+      print("Request failed with status: ${request.statusCode}");
     }
   }
 
@@ -74,12 +92,20 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
     print("fetching $url");
     final request = await http.get(Uri.parse(url));
     if (request.statusCode == 200) {
-      setState(() {
-        workerComments = jsonDecode(request.body);
-      });
-      print("workerComments: $workerComments");
+      if (request.body.isNotEmpty) {
+        try {
+          setState(() {
+            workerComments = jsonDecode(request.body);
+          });
+          print("workerComments: $workerComments");
+        } catch (e) {
+          print("Error parsing JSON: $e");
+        }
+      } else {
+        print("Empty response body");
+      }
     } else {
-      print("Request failed");
+      print("Request failed with status: ${request.statusCode}");
     }
   }
 
@@ -89,25 +115,33 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
     print("fetching $url");
     final request = await http.get(Uri.parse(url));
     if (request.statusCode == 200) {
-      List<dynamic> result = jsonDecode(request.body);
-      setState(() {
-        workerProjects = result;
-        projectsWithImages.clear(); // Clear existing data
-        for (var project in workerProjects) {
-          String projectName = project['project_name'];
-          String image = project['image'];
+      if (request.body.isNotEmpty) {
+        try {
+          List<dynamic> result = jsonDecode(request.body);
+          setState(() {
+            workerProjects = result;
+            projectsWithImages.clear(); // Clear existing data
+            for (var project in workerProjects) {
+              String projectName = project['project_name'];
+              String image = project['image'];
 
-          if (projectsWithImages.containsKey(projectName)) {
-            projectsWithImages[projectName]!.add(image);
-          } else {
-            projectsWithImages[projectName] = [image];
-          }
+              if (projectsWithImages.containsKey(projectName)) {
+                projectsWithImages[projectName]!.add(image);
+              } else {
+                projectsWithImages[projectName] = [image];
+              }
+            }
+            print("projects are $workerProjects");
+            print("new  shi $projectsWithImages");
+          });
+        } catch (e) {
+          print("Error parsing JSON: $e");
         }
-        print("projects are $workerProjects");
-        print("new  shi $projectsWithImages");
-      });
+      } else {
+        print("Empty response body");
+      }
     } else {
-      print("Request failed");
+      print("Request failed with status: ${request.statusCode}");
     }
   }
 
@@ -136,297 +170,198 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
       appBar: AppBar(),
       body: loading
           ? Center(
-              child: LoadingAnimationWidget.inkDrop(
-                  color: Colors.blueAccent,
-                  size: ((screenWidth / 15) + (screenHeight / 15))))
+          child: LoadingAnimationWidget.inkDrop(
+              color: Colors.blueAccent,
+              size: ((screenWidth / 15) + (screenHeight / 15))))
           : SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: screenHeight * 0.3,
+              color: availability == '1' ? Colors.green : Colors.red,
+              child: Column(
+                children: [
+                  SizedBox(height: 50),
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: CachedNetworkImageProvider(
+                        "https://switch.unotelecom.com/fixpert/assets/$workerPic"),
+                  ),
+                  SizedBox(height: 10),
+                  Text(workerName ?? "",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold)),
+                  SizedBox(height: 5),
+                  Text(email ?? "", style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: CircleAvatar(
-                          radius: screenWidth / 7,
-                          backgroundImage: NetworkImage(
-                            "https://switch.unotelecom.com/fixpert/assets/$workerPic",
-                          ),
-                        ),
-                      ),
-                      Spacer(),
-                    ],
+                children: [
+                  Text(
+                    'Address: $address ',
+                    style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
-                  SizedBox(height: 15),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      '$workerName',
-                      style:
-                          TextStyle(fontWeight: FontWeight.w800, fontSize: 24),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      widget.serviceByWorker ?? "service",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18,
-                          color: Colors.grey),
-                    ),
+                  Text(
+                    'Work time: $open_time-$close_time',
+                    style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   SizedBox(height: 5),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      '$address',
-                      style: TextStyle(
-                          color: Colors.grey, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      'Open Time: $openTime',
-                      style: TextStyle(
-                          color: Colors.grey, fontWeight: FontWeight.w500),
-                    ),
-                  ),
                   SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      "About",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-                    ),
+                  Text(
+                    'About',
+                    style: TextStyle(
+                        fontSize: 21, fontWeight: FontWeight.w500),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
                   ),
+                  SizedBox(height: 5),
                   if (about!.isEmpty)
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      child: Text(
-                        "No about",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    )
-                  else
-                    Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text(
-                        "$about",
-                        style: TextStyle(),
+                    Text(
+                      "No Available About !",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
                       ),
                     ),
-
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      "Projects",
-                      style:
-                          TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
-                    ),
+                  Text(about ?? "", style: TextStyle(fontSize: 16)),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Projects',
+                    style: TextStyle(
+                        fontSize: 21, fontWeight: FontWeight.w500),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
                   ),
-                  projectsWithImages.isEmpty
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          child: Text(
-                            "No projects available",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 0.75,
-                            ),
-                            itemCount: projectsWithImages.length,
-                            itemBuilder: (context, index) {
-                              String projectName =
-                                  projectsWithImages.keys.elementAt(index);
-                              List<String> images =
-                                  projectsWithImages.values.elementAt(index);
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => ProjectDetailsPage(
-                                      projectName: projectName,
-                                      images: images,
-                                    ),
-                                  ));
-                                },
-                                child: Card(
-                                  elevation: 5, // Add elevation for shadow
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Stack(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(15),
-                                              topRight: Radius.circular(15),
-                                            ),
-                                            child: CachedNetworkImage(
-                                              imageUrl:
-                                                  "https://switch.unotelecom.com/fixpert/assets/worker_projects/${images[0]}",
-                                              placeholder: (context, url) =>
-                                                  Center(
-                                                child: LoadingAnimationWidget
-                                                    .prograssiveDots(
-                                                  color: Colors.blueAccent,
-                                                  size: 50,
-                                                ),
-                                              ),
-                                              errorWidget:
-                                                  (context, url, error) => Icon(
-                                                Icons.error,
-                                                size: 50,
-                                              ),
-                                              width: double.infinity,
-                                              height: screenHeight * 0.2,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 8,
-                                            left: 8,
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 6, vertical: 3),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black54,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.image,
-                                                    color: Colors.white,
-                                                    size: 16,
-                                                  ),
-                                                  SizedBox(width: 4),
-                                                  Text(
-                                                    images.length.toString(),
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(10),
-                                        child: Text(
-                                          projectName,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                  SizedBox(height: 5),
+                  SizedBox(height: 5),
+                  projectsWithImages.isNotEmpty
+                      ? GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 8.0,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemCount: projectsWithImages.length,
+                    itemBuilder: (context, index) {
+                      String projectName = projectsWithImages.keys
+                          .elementAt(index);
+                      List<String> images =
+                      projectsWithImages[projectName]!;
+
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ProjectDetailsPage(
+                                        images: images,
+                                        projectName: projectName,
+                                        worker_id: widget.id.toString() ,
+                                      )));
+                        },
+                        child: Card(
+                          elevation: 4,
+                          child: Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                  "https://switch.unotelecom.com/fixpert/assets/worker_projects/${images[0]}",
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
                                 ),
-                              );
-                            },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  projectName,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                  SizedBox(
-                    height: 15,
+                      );
+                    },
+                  )
+                      : Text(
+                    "No projects available",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
                   ),
-                  // Center(
-                  //   child:
                   Padding(
-                    padding: EdgeInsets.only(left: 10),
+                    padding: EdgeInsets.only(left: 0),
                     child: Text(
                       "Reviews",
-                      style:
-                          TextStyle(fontSize: 21, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          fontSize: 21, fontWeight: FontWeight.w500),
                     ),
                   ),
-                  // ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(left: 10),
+                    padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      widget.rate!.toStringAsFixed(1),
+                      widget.rate?.toStringAsFixed(1) ?? '0.0',
                       style: TextStyle(fontSize: 32),
                     ),
                   ),
-
                   Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: RatingBar.builder(
-                      initialRating: widget.rate ?? 0,
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      itemSize: 20,
-                      maxRating: 5,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      ignoreGestures: true,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 0.0),
-                      itemBuilder: (context, _) => Icon(
+                    padding: EdgeInsets.only(left: 0),
+                    child: RatingBarIndicator(
+                      rating: widget.rate ?? 0,
+                      itemBuilder: (context, index) => Icon(
                         Icons.star,
                         color: Colors.amber,
                       ),
-                      onRatingUpdate: (rating) {},
+                      itemCount: 5,
+                      itemSize: 25.0,
+                      direction: Axis.horizontal,
                     ),
                   ),
                   SizedBox(
                     height: 10,
                   ),
                   Padding(
-                    padding: EdgeInsets.only(left: 10),
+                    padding: EdgeInsets.only(left: 0),
                     child: Text(
                       "${workerComments.length}  reviews",
                       style: TextStyle(fontSize: 18),
@@ -435,22 +370,24 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                   acc_type!.contains('worker')
                       ? SizedBox()
                       : TextButton(
-                          onPressed: () {
-                            if (loggedIn ?? false) {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => WriteReviewPage(
-                                  worker_id: widget.id,
-                                ),
-                              ));
-                            } else {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => Home(neededPage: 3),
-                              ));
-                            }
-                          },
-                          child: Text("Write a review")),
+                      onPressed: () {
+                        if (loggedIn ?? false) {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(
+                            builder: (context) => WriteReviewPage(
+                              worker_id: widget.id,
+                            ),
+                          ));
+                        } else {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(
+                            builder: (context) => Home(neededPage: 3),
+                          ));
+                        }
+                      },
+                      child: Text("Write a review")),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     child: Column(
                       children: [
                         ListView.builder(
@@ -459,8 +396,8 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                           itemCount: showAllComments
                               ? workerComments.length
                               : (workerComments.length > 4
-                                  ? 4
-                                  : workerComments.length),
+                              ? 4
+                              : workerComments.length),
                           itemBuilder: (context, index) {
                             return Container(
                               padding: EdgeInsets.all(10),
@@ -470,13 +407,14 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
                                       CircleAvatar(
                                         backgroundImage:
-                                            CachedNetworkImageProvider(
+                                        CachedNetworkImageProvider(
                                           "https://switch.unotelecom.com/fixpert/assets/${workerComments[index]['pic_uri']}",
                                         ),
                                         radius: 20,
@@ -493,19 +431,17 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                                   SizedBox(height: 5),
                                   Text(workerComments[index]['comment']),
                                   SizedBox(height: 5),
-                                  RatingBar.builder(
-                                    initialRating: workerComments[index]['rate']
-                                        .toDouble(),
-                                    minRating: 1,
-                                    direction: Axis.horizontal,
-                                    itemSize: 16,
-                                    allowHalfRating: true,
-                                    ignoreGestures: true,
-                                    itemBuilder: (context, _) => Icon(
+                                  RatingBarIndicator(
+                                    rating: workerComments[index]['rate']
+                                        .toDouble() ??
+                                        0,
+                                    itemBuilder: (context, index) => Icon(
                                       Icons.star,
                                       color: Colors.amber,
                                     ),
-                                    onRatingUpdate: (rating) {},
+                                    itemCount: 5,
+                                    itemSize: 16.0,
+                                    direction: Axis.horizontal,
                                   ),
                                 ],
                               ),
@@ -525,17 +461,17 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                                 children: [
                                   showAllComments
                                       ? Row(
-                                          children: [
-                                            Text("View Less"),
-                                            Icon(Icons.arrow_upward),
-                                          ],
-                                        )
+                                    children: [
+                                      Text("View Less"),
+                                      Icon(Icons.arrow_upward),
+                                    ],
+                                  )
                                       : Row(
-                                          children: [
-                                            Text("View More"),
-                                            Icon(Icons.arrow_downward),
-                                          ],
-                                        ),
+                                    children: [
+                                      Text("View More"),
+                                      Icon(Icons.arrow_downward),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
@@ -543,13 +479,12 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
                       ],
                     ),
                   ),
-
-                  SizedBox(
-                    height: 49,
-                  )
                 ],
               ),
             ),
+          ],
+        ),
+      ),
     );
   }
 }
