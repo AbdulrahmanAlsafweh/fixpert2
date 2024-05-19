@@ -16,26 +16,34 @@ class _ChangePasswordpageState extends State<ChangePasswordpage> {
   late TextEditingController repeatedPasswordController;
   String baseUrl = 'https://switch.unotelecom.com/fixpert/changeCustomerPassword.php';
   String? user_id;
-
+  String? acc_type;
   @override
   void initState() {
     super.initState();
     currentPassowrdController = TextEditingController();
     newPasswordController = TextEditingController();
     repeatedPasswordController = TextEditingController();
-    getCustomerId();
+    fetchData();
   }
 
-  Future<void> getCustomerId() async {
+  Future<void> fetchData() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {
       user_id = sp.getString('user_id');
+      acc_type = sp.getString('acc_type');
     });
   }
 
   Future<void> changePassword() async {
     if (newPasswordController.text == repeatedPasswordController.text && newPasswordController.text.isNotEmpty && repeatedPasswordController.text.isNotEmpty) {
-      final url = "$baseUrl?user_id=$user_id&current_password=${currentPassowrdController.text}&new_password=${newPasswordController.text}";
+      String url='';
+      if(acc_type!.contains('worker')){
+         url="https://switch.unotelecom.com/fixpert/changeWorkerPassword.php?user_id=$user_id&current_password=${currentPassowrdController.text}&new_password=${newPasswordController.text}";
+      }
+      else {
+         url = "https://switch.unotelecom.com/fixpert/changeCustomerPassword.php?user_id=$user_id&current_password=${currentPassowrdController
+            .text}&new_password=${newPasswordController.text}";
+      }
       print("fetching $url");
       final request = await http.get(Uri.parse(url));
       if (request.statusCode == 200) {

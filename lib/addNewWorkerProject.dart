@@ -160,7 +160,7 @@ class _AddNewWorkerProjectState extends State<AddNewWorkerProject> {
         onPressed: () {
           _selectImages();
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add_photo_alternate_outlined),
       ),
       body:
       SingleChildScrollView(

@@ -57,27 +57,34 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         shadowColor: Colors.grey[100],
         elevation: 2,
-        actions: [
-          Spacer(),
-          Container(child: Image.asset('assets/homeLogo.png')),
-          SizedBox(width: 5),
-          Text(
-            'Fixpert',
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500, color: Colors.black),
-          ),
-          Spacer(),
-        ],
+        centerTitle: true,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/homeLogo.png', height: 40),
+            SizedBox(width: 10),
+            Text(
+              'Fixpert',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             projects.isNotEmpty
                 ? CarouselSlider(
               options: CarouselOptions(
                 height: 400.0,
                 autoPlay: true,
                 autoPlayInterval: Duration(seconds: 3),
+                enlargeCenterPage: true,
               ),
               items: projects.map((i) {
                 return Builder(
@@ -85,31 +92,43 @@ class _HomePageState extends State<HomePage> {
                     return Container(
                       width: MediaQuery.of(context).size.width,
                       margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      decoration: BoxDecoration(color: Colors.grey),
-                      child: CachedNetworkImage(
-                        imageUrl: "https://switch.unotelecom.com/fixpert/assets/worker_projects/${i['image']}",
-                        placeholder: (context, url) => Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Opacity(
-                              opacity: 0.7,
-                              child: Image.asset(
-                                "assets/logo.png",
-                                width: 1000,
-                                height: 2000,
-                                fit: BoxFit.cover,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: CachedNetworkImage(
+                          imageUrl: "https://switch.unotelecom.com/fixpert/assets/worker_projects/${i['image']}",
+                          placeholder: (context, url) => Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Opacity(
+                                opacity: 0.7,
+                                child: Image.asset(
+                                  "assets/logo.png",
+                                  width: 1000,
+                                  height: 2000,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
-                        LoadingAnimationWidget
-                            .prograssiveDots(
-                          color: Colors.blueAccent,
-                          size: 50,
+                              LoadingAnimationWidget.prograssiveDots(
+                                color: Colors.blueAccent,
+                                size: 50,
+                              ),
+                            ],
+                          ),
+                          errorWidget: (context, url, error) => Icon(Icons.error),
+                          width: 1000,
+                          fit: BoxFit.cover,
                         ),
-                          ],
-                        ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                        width: 1000,
-                        fit: BoxFit.cover,
                       ),
                     );
                   },
@@ -121,7 +140,7 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                 child: LoadingAnimationWidget.fourRotatingDots(
                   color: Colors.blueAccent,
-                  size: 30.0,
+                  size: 50.0,
                 ),
               ),
             ),
@@ -132,7 +151,11 @@ class _HomePageState extends State<HomePage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Browse By Category",
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w400),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
             ),
@@ -151,43 +174,44 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
+                              borderRadius: BorderRadius.circular(15),
                             ),
                             child: Padding(
                               padding: EdgeInsets.only(right: 10),
                               child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
                                 child: CachedNetworkImage(
                                   imageUrl: "https://switch.unotelecom.com/fixpert/assets/services_image/${services[index]['image_uri']}",
-                                  placeholder: (context, url) => LoadingAnimationWidget
-                                      .prograssiveDots(
-                  color: Colors.blueAccent,
-                  size: 50,
-                  ),
+                                  placeholder: (context, url) => LoadingAnimationWidget.prograssiveDots(
+                                    color: Colors.blueAccent,
+                                    size: 50,
+                                  ),
                                   errorWidget: (context, url, error) => Icon(Icons.error),
                                   width: screenWidth / 1.5,
                                   height: screenHeight / 4,
                                   fit: BoxFit.cover,
                                 ),
-                                borderRadius: BorderRadius.circular(25),
                               ),
                             ),
                           ),
                           ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
                             child: Container(
-                              child: Align(
+                              width: screenWidth / 1.5,
+                              height: screenHeight / 4,
+                              color: Colors.black.withOpacity(0.4),
+                              child: Center(
                                 child: Text(
                                   services[index]['name'],
                                   style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                alignment: Alignment.center,
                               ),
-                              color: Colors.grey[300]!.withOpacity(0.6),
-                              width: screenWidth / 1.5,
                             ),
-                            borderRadius: BorderRadius.circular(25),
                           ),
                         ],
                       ),
@@ -205,43 +229,45 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
+                              borderRadius: BorderRadius.circular(15),
                             ),
                             child: Padding(
                               padding: EdgeInsets.only(right: 10),
                               child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
                                 child: Image.asset(
                                   "assets/viewMore.jpg",
                                   width: screenWidth / 1.5,
                                   height: screenHeight / 4,
                                   fit: BoxFit.cover,
                                 ),
-                                borderRadius: BorderRadius.circular(25),
                               ),
                             ),
                           ),
                           ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
                             child: Container(
-                              child: Align(
+                              width: screenWidth / 1.5,
+                              height: screenHeight / 4,
+                              color: Colors.black.withOpacity(0.4),
+                              child: Center(
                                 child: Text(
                                   "View More",
                                   style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                alignment: Alignment.center,
                               ),
-                              color: Colors.grey[300]!.withOpacity(0.6),
-                              width: screenWidth / 1.5,
                             ),
-                            borderRadius: BorderRadius.circular(25),
                           ),
                         ],
                       ),
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => SelectCategory(services: [services]),
+                          builder: (context) => SelectCategory(services: services),
                         ));
                       },
                     );
@@ -249,10 +275,9 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             )
-                : LoadingAnimationWidget.fourRotatingDots(color: Colors.blueAccent, size: 30.0),
+                : LoadingAnimationWidget.fourRotatingDots(color: Colors.blueAccent, size: 50.0),
             SizedBox(height: 30),
             Stack(
-              fit: StackFit.passthrough,
               children: [
                 Container(
                   width: screenWidth,
@@ -266,9 +291,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Positioned(
-                  left: 23,
-                  top: 5,
-                  width: screenHeight / 2.3,
+                  left: 20,
+                  top: 10,
+                  width: screenWidth - 40,
                   height: screenHeight / 3,
                   child: Container(
                     decoration: BoxDecoration(
@@ -298,22 +323,19 @@ class _HomePageState extends State<HomePage> {
                     text: TextSpan(
                       style: TextStyle(
                         fontSize: 32,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                       children: [
+                        TextSpan(text: 'All Your Home \n'),
                         TextSpan(
-                          text: 'All Your Home \n',
-                        ),
-                        TextSpan(
-                          text: 'Needs',
+                          text: 'Needs ',
                           style: TextStyle(
                             backgroundColor: Colors.red,
+                            color: Colors.white,
                           ),
                         ),
-                        TextSpan(
-                          text: ' One Place',
-                        ),
+                        TextSpan(text: 'in One Place'),
                       ],
                     ),
                   ),

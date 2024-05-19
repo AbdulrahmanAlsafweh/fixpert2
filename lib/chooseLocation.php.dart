@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
+import 'changeOpenTime.dart';
 class ChooseLocationPage extends StatefulWidget {
   const ChooseLocationPage({Key? key}) : super(key: key);
 
@@ -98,7 +99,7 @@ class _ChooseLocationPageState extends State<ChooseLocationPage> {
             updateLocation();
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => Home(),
+                builder: (context) => ChangeOpenTimePage(),
               ),
             );
           }

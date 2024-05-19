@@ -1,7 +1,8 @@
-import 'package:fixpert/search.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'search.dart';
+
 class SelectCategory extends StatefulWidget {
   final List<dynamic> services;
   const SelectCategory({Key? key, required this.services}) : super(key: key);
@@ -18,7 +19,7 @@ class _SelectCategoryState extends State<SelectCategory> {
   @override
   void initState() {
     super.initState();
-    filteredServices = widget.services.isNotEmpty ? widget.services[0] : [];
+    filteredServices = widget.services;
   }
 
   @override
@@ -37,7 +38,6 @@ class _SelectCategoryState extends State<SelectCategory> {
         },
         child: Icon(Icons.arrow_forward),
       ),
-
       appBar: AppBar(
         backgroundColor: Colors.white,
         shadowColor: Colors.grey,
@@ -104,8 +104,7 @@ class _SelectCategoryState extends State<SelectCategory> {
                                 ),
                                 child: CachedNetworkImage(
                                   imageUrl: "https://switch.unotelecom.com/fixpert/assets/services_image/${filteredServices[index]['image_uri']}",
-                                  placeholder: (context, url) => LoadingAnimationWidget
-                                      .prograssiveDots(
+                                  placeholder: (context, url) => LoadingAnimationWidget.prograssiveDots(
                                     color: Colors.blueAccent,
                                     size: 50,
                                   ), // Loading indicator
@@ -155,25 +154,21 @@ class _SelectCategoryState extends State<SelectCategory> {
         ],
       ),
     );
-
   }
 
   void filterServices(String query) {
     // If the query is empty, display all services
     if (query.isEmpty) {
       setState(() {
-        filteredServices = widget.services.isNotEmpty ? widget.services[0] : [];
+        filteredServices = widget.services;
       });
       return;
     }
 
     // Filter services based on the query
-    List<dynamic> filteredList = [];
-    widget.services[0].forEach((service) {
-      if (service['name'].toLowerCase().contains(query.toLowerCase())) {
-        filteredList.add(service);
-      }
-    });
+    List<dynamic> filteredList = widget.services.where((service) {
+      return service['name'].toLowerCase().contains(query.toLowerCase());
+    }).toList();
 
     setState(() {
       filteredServices = filteredList;

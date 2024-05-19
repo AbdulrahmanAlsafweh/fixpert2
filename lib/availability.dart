@@ -69,7 +69,7 @@ class _AvailabilityState extends State<Availability> {
                     ElevatedButton(onPressed:() {
                       updateAvailability(0);
                       Navigator.of(context).popUntil((route) => route.isFirst);
-                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home(),));},
+                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChooseLocationPage(),));},
                         child: Text(
                             "Not Now"
                         ),style: ButtonStyle(

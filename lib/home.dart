@@ -44,18 +44,14 @@ class _HomeState extends State<Home> {
 
 
   @override
+  @override
   void initState() {
-
     super.initState();
-    // if(
-    // !widget.neededPage!.isNaN
-    // ){
-    //   _selectedIndex = widget.neededPage ?? 0;
-    // }
-    _selectedIndex = widget.neededPage ?? 0;
     loadData();
-
-    print(isLoggedIn);
+    // Check if neededPage is not null and within bounds
+    if (widget.neededPage != null && widget.neededPage! >= 0 && widget.neededPage! < 4) {
+      _selectedIndex = widget.neededPage!;
+    }
   }
 
 

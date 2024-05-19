@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:animated_rating_stars/animated_rating_stars.dart';
-import 'workerPageFromCustomer.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+
+import 'workerPageFromCustomer.dart';
 
 class SearchPage extends StatefulWidget {
   final List<int>? services_id;
@@ -25,8 +25,7 @@ class _SearchPageState extends State<SearchPage> {
   bool isLoading = false;
   bool isFirstResponseDone = false;
 
-  Future<void> searchWorker(
-      String workerName, List<dynamic> selectedServiceIds) async {
+  Future<void> searchWorker(String workerName, List<dynamic> selectedServiceIds) async {
     setState(() {
       isLoading = true;
     });
@@ -123,234 +122,221 @@ class _SearchPageState extends State<SearchPage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: Center(child: Text('Search Workers'),) ,
+      //   backgroundColor: Colors.blueAccent,
+      ),
       body: isFirstResponseDone
           ? Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: TextField(
-                    controller: searchTextController,
-                    onChanged: (value) {
-                      searchWorker(
-                          searchTextController.text, selectedServiceIds);
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: TextField(
+              controller: searchTextController,
+              onChanged: (value) {
+                searchWorker(searchTextController.text, selectedServiceIds);
+              },
+              decoration: InputDecoration(
+                labelText: 'Search by worker name',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide.none,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    searchWorker(searchTextController.text, selectedServiceIds);
+                  },
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          Container(
+            height: screenHeight / 14,
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              scrollDirection: Axis.horizontal,
+              itemCount: services.length + 1,
+              itemBuilder: (context, index) {
+                if (index < services.length) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        services[index]['toggled'] = !services[index]['toggled'];
+                        if (services[index]['toggled']) {
+                          selectedServiceIds.add(int.parse(services[index]['id']));
+                        } else {
+                          selectedServiceIds.remove(int.parse(services[index]['id']));
+                        }
+                        searchWorker(searchTextController.text, selectedServiceIds);
+                      });
                     },
-                    decoration: InputDecoration(
-                      labelText: 'Search by worker name',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.search),
-                        onPressed: () {
-                          searchWorker(
-                              searchTextController.text, selectedServiceIds);
-                        },
+                    child: Container(
+                      margin: EdgeInsets.all(5),
+                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: services[index]['toggled'] ? Colors.blueAccent : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          if (services[index]['toggled']) Icon(Icons.cancel_outlined, color: Colors.white),
+                          if (services[index]['toggled']) SizedBox(width: 5),
+                          Text(
+                            services[index]['name'],
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: services[index]['toggled'] ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  height: screenHeight / 14,
-                  child: ListView.builder(
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: services.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index < services.length){
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            services[index]['toggled'] =
-                                !services[index]['toggled'];
-                            if (services[index]['toggled']) {
-                              selectedServiceIds
-                                  .add(int.parse(services[index]['id']));
-                            } else {
-                              selectedServiceIds
-                                  .remove(int.parse(services[index]['id']));
-                            }
-                            searchWorker(
-                                searchTextController.text, selectedServiceIds);
-                          });
-                        },
-                        child: Container(
-                          margin: EdgeInsets.all(5),
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: services[index]['toggled']
-                                ? Colors.grey[400]
-                                : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              services[index]['toggled']
-                                  ? Icon(Icons.cancel_outlined)
-                                  : SizedBox(width: 0, height: 0),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                services[index]['name'],
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );} else{
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectCategory(services: services,),));
-                      },
-                      child: Container(
-                        margin: EdgeInsets.all(5),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            SizedBox(
-                              width: 5,
+                  );
+                } else {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectCategory(services: services)));
+                    },
+                    child: Container(
+                      margin: EdgeInsets.all(5),
+                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            "View More",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
                             ),
-                            Text(
-                              "View More",
-                              style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w400),
-                            ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+          SizedBox(height: 10),
+          Expanded(
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : ListView.builder(
+              itemCount: worker.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => WorkerPageByOthers(
+                          serviceByWorker: worker[index]['service_name'],
+                          id: int.parse(worker[index]['worker_id']),
+                          rate: double.parse((worker[index]['avg_rate']) ?? '0'),
                         ),
                       ),
                     );
-                      }
-                    },
-                  ),
-                ),
-                SizedBox(height: 10),
-                Expanded(
-                  child: isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                          itemCount: worker.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .popUntil((route) => route.isFirst);
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => WorkerPageByOthers(
-                                      serviceByWorker: worker[index]['service_name'],
-                                        id: int.parse(
-                                            worker[index]['worker_id']),
-                                        rate: double.parse((worker[index]
-                                                ['avg_rate']) ??
-                                            '0')),
-                                  ),
-                                );
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 5, bottom: 2),
-                                child: Container(
-                                  height: screenHeight / 11,
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 5,
-                                        color: (worker[index]['availability']
-                                                    .toString()
-                                                    .trim() ==
-                                                "1")
-                                            ? Colors.green
-                                            : Colors.red,
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 5,
+                            height: screenHeight / 11,
+                            color: (worker[index]['availability'].toString().trim() == "1") ? Colors.green : Colors.red,
+                          ),
+                          SizedBox(width: 10),
+                          ClipOval(
+                            child: Image.network(
+                              "https://switch.unotelecom.com/fixpert/assets/${worker[index]['profile_pic'].toString()}",
+                              width: screenWidth / 6,
+                              height: screenWidth / 6,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      worker[index]['worker_name'],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
                                       ),
-                                      Image.network(
-                                          width: 75,
-                                          "https://switch.unotelecom.com/fixpert/assets/${worker[index]['profile_pic'].toString()}"),
-                                      SizedBox(width: 10),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Container(
-                                            constraints: BoxConstraints(
-                                                maxWidth: screenWidth - 100),
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  worker[index]['worker_name'],
-                                                  textAlign: TextAlign.start,
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                                Spacer(),
-                                                worker[index]['avg_rate'] !=
-                                                            null &&
-                                                        worker[index]
-                                                                ['avg_rate'] !=
-                                                            ''
-                                                    ? RatingBar.builder(
-                                                        initialRating: double
-                                                            .parse(worker[index]
-                                                                    [
-                                                                    'avg_rate'] ??
-                                                                "0"),
-                                                        minRating: 1,
-                                                        direction:
-                                                            Axis.horizontal,
-                                                        itemSize: 20,
-                                                        maxRating: 5,
-                                                        allowHalfRating: true,
-                                                        itemCount: 5,
-                                                        ignoreGestures: true,
-                                                        itemPadding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    0.0),
-                                                        itemBuilder:
-                                                            (context, _) =>
-                                                                Icon(
-                                                          Icons.star,
-                                                          color: Colors.amber,
-                                                        ),
-                                                        onRatingUpdate:
-                                                            (rating) {},
-                                                      )
-                                                    : SizedBox(),
-                                              ],
-                                            ),
-                                          ),
-                                          Text(
-                                            worker[index]['service_name'],
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                          SizedBox(height: 10),
-                                        ],
-                                      )
-                                    ],
+                                    ),
+                                    worker[index]['avg_rate'] != null && worker[index]['avg_rate'] != ''
+                                        ?
+                                    RatingBarIndicator(
+                                      rating: double.parse(worker[index]['avg_rate'] ?? "0") ,
+                                      itemBuilder: (context, index) => Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      itemCount: 5,
+                                      itemSize: 18.0,
+                                      direction: Axis.horizontal,
+                                    )
+                                        : SizedBox(),
+                                  ],
+                                ),
+                                Text(
+                                  worker[index]['service_name'],
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16,
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            )
+                                SizedBox(height: 10),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      )
           : Center(
-              child: LoadingAnimationWidget.inkDrop(
-              color: Colors.blueAccent,
-              size: ((screenWidth / 15) + (screenHeight / 15)),
-            )),
+        child: LoadingAnimationWidget.inkDrop(
+          color: Colors.blueAccent,
+          size: ((screenWidth / 15) + (screenHeight / 15)),
+        ),
+      ),
     );
   }
 }
