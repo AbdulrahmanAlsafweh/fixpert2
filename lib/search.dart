@@ -4,9 +4,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-
+import 'sendQuote.dart';
 import 'workerPageFromCustomer.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class SearchPage extends StatefulWidget {
   final List<int>? services_id;
 
@@ -16,7 +16,8 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends State<SearchPage>
+    with SingleTickerProviderStateMixin {
   TextEditingController searchTextController = TextEditingController();
   String baseUrl = "https://switch.unotelecom.com/fixpert/getWorker.php";
   List<dynamic> services = [];
@@ -25,15 +26,20 @@ class _SearchPageState extends State<SearchPage> {
   bool isLoading = false;
   bool isFirstResponseDone = false;
   bool filterByAvailability = false;
+bool? isLoggedIn ;
+  String? acc_type;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
-
-
-
-
-
-  List<String> locations = ["None","North Lebanon", "South Lebanon", 'Bekaa', "Mount Lebanon", "Beirut"];
+  List<String> locations = [
+    "None",
+    "North Lebanon",
+    "South Lebanon",
+    'Bekaa',
+    "Mount Lebanon",
+    "Beirut"
+  ];
   String selectedLocation = "";
-
 
   Future<void> searchWorker(
       String workerName, List<dynamic> selectedServiceIds) async {
@@ -47,14 +53,22 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     if (selectedServiceIds.isNotEmpty) {
-      url += (workerName.isNotEmpty ? "&" : "?") + "serviceIds=${selectedServiceIds.join(',')}";
+      url += (workerName.isNotEmpty ? "&" : "?") +
+          "serviceIds=${selectedServiceIds.join(',')}";
     }
 
     if (filterByAvailability) {
-      url += (workerName.isNotEmpty || selectedServiceIds.isNotEmpty ? "&" : "?") + "availability=1";
+      url +=
+          (workerName.isNotEmpty || selectedServiceIds.isNotEmpty ? "&" : "?") +
+              "availability=1";
     }
-    if(!selectedLocation.contains('None')){
-      url+=(workerName.isNotEmpty || selectedServiceIds.isNotEmpty  || filterByAvailability ?"&":"?")+"selectedLocation=$selectedLocation";
+    if (!selectedLocation.contains('None')) {
+      url += (workerName.isNotEmpty ||
+                  selectedServiceIds.isNotEmpty ||
+                  filterByAvailability
+              ? "&"
+              : "?") +
+          "selectedLocation=$selectedLocation";
     }
     print(url);
     try {
@@ -121,18 +135,28 @@ class _SearchPageState extends State<SearchPage> {
       print('Error fetching services: $error');
     }
   }
+
   void dispose() {
     // Cancel any ongoing operations like network requests or timers here
     searchTextController.dispose(); // Dispose the TextEditingController
+    _controller.dispose();
     super.dispose();
   }
+  Future<void> fetchData() async{
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    setState(() {
+      acc_type = sp.getString("acc_type");
+      isLoggedIn = sp.getBool("loggedIn");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    fetchData();
     // fetchLocations();
     setState(() {
       selectedLocation = locations[0].toString();
-
     });
 
     if (widget.services_id != null) {
@@ -144,6 +168,14 @@ class _SearchPageState extends State<SearchPage> {
 
     getServices();
 
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween(begin: 0.5, end: 1.0).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -188,14 +220,14 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 Container(
                   width: double.infinity, // Ensure finite width
                   child: Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.only(left: 20),
-                        child: Text("Availability", style: TextStyle(fontSize: 18)),
+                        child: Text("Availability",
+                            style: TextStyle(fontSize: 18)),
                       ),
                       Checkbox(
                         checkColor: Colors.green,
@@ -203,13 +235,16 @@ class _SearchPageState extends State<SearchPage> {
                         onChanged: (value) {
                           setState(() {
                             filterByAvailability = value!;
-                            searchWorker(searchTextController.text, selectedServiceIds);
+                            searchWorker(
+                                searchTextController.text, selectedServiceIds);
                           });
                         },
                       ),
-                      SizedBox(width: 20), // Add spacing between Checkbox and DropdownButtonFormField
+                      SizedBox(
+                          width:
+                              20), // Add spacing between Checkbox and DropdownButtonFormField
                       Expanded(
-                        child:DropdownButtonFormField(
+                        child: DropdownButtonFormField(
                           value: selectedLocation,
                           items: locations.map((location) {
                             return DropdownMenuItem(
@@ -220,17 +255,15 @@ class _SearchPageState extends State<SearchPage> {
                           onChanged: (value) {
                             setState(() {
                               selectedLocation = value.toString();
-                              searchWorker(searchTextController.text, selectedServiceIds);
+                              searchWorker(searchTextController.text,
+                                  selectedServiceIds);
                             });
                           },
                           decoration: InputDecoration(
-
                             labelText: 'Filter by Location',
                             filled: true,
-
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
-
                               borderRadius: BorderRadius.circular(20),
                               borderSide: BorderSide.none,
                             ),
@@ -240,7 +273,6 @@ class _SearchPageState extends State<SearchPage> {
                     ],
                   ),
                 ),
-
                 SizedBox(height: 10),
                 Container(
                   height: screenHeight / 14,
@@ -331,131 +363,169 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 SizedBox(height: 10),
                 Expanded(
-                  child: isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                          itemCount: worker.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .popUntil((route) => route.isFirst);
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => WorkerPageByOthers(
-                                      serviceByWorker: worker[index]
-                                          ['service_name'],
-                                      id: int.parse(worker[index]['worker_id']),
-                                      rate: double.parse(
-                                          (worker[index]['avg_rate']) ?? '0'),
+                    child: isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : ListView.builder(
+                      itemCount: worker.length,
+                      itemBuilder: (context, index) {
+                        return Dismissible(
+                          key: Key(worker[index]['worker_id']),
+                          direction: DismissDirection.endToStart,
+                          onDismissed: (direction) {
+                            // Remove the dismissed item from the list
+
+                            !acc_type!.contains('worker') && isLoggedIn! ?
+                                {
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => AppointmentPage(worker_id: worker[index]['worker_id'],worker_name: worker[index]['worker_name'],)),
+                            ).then((value) => setState(() {
+                              worker.removeAt(index);
+                            }),)
+
+                                }:
+
+                            {ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("You have to be logged in with client acc !"),backgroundColor: Colors.red,)),
+                            setState(() {
+        searchWorker('',[]);
+                            })
+                            };
+
+                          },
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                FadeTransition(
+                                  opacity: _animation,
+                                  child: Text(
+                                    'Slide to right',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                );
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
+                                ),
+                                SizedBox(width: 10),
+                                FadeTransition(
+                                  opacity: _animation,
+                                  child: Icon(
+                                    Icons.arrow_forward,
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 5,
-                                        height: screenHeight / 11,
-                                        color: (worker[index]['availability']
-                                                    .toString()
-                                                    .trim() ==
-                                                "1")
-                                            ? Colors.green
-                                            : Colors.red,
+                                ),
+                              ],
+                            ),
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.popUntil(context, (route) => route.isFirst);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WorkerPageByOthers(
+                                    serviceByWorker: worker[index]['service_name'],
+                                    id: int.parse(worker[index]['worker_id']),
+                                    rate: double.parse(worker[index]['avg_rate'] ?? '0'),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 5,
+                                      height: MediaQuery.of(context).size.height / 11,
+                                      color: (worker[index]['availability'].toString().trim() == "1")
+                                          ? Colors.green
+                                          : Colors.red,
+                                    ),
+                                    SizedBox(width: 10),
+                                    ClipOval(
+                                      child: Image.network(
+                                        "https://switch.unotelecom.com/fixpert/assets/${worker[index]['profile_pic'].toString()}",
+                                        width: MediaQuery.of(context).size.width / 6,
+                                        height: MediaQuery.of(context).size.width / 6,
+                                        fit: BoxFit.cover,
                                       ),
-                                      SizedBox(width: 10),
-                                      ClipOval(
-                                        child: Image.network(
-                                          "https://switch.unotelecom.com/fixpert/assets/${worker[index]['profile_pic'].toString()}",
-                                          width: screenWidth / 6,
-                                          height: screenWidth / 6,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  worker[index]['worker_name'],
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 18,
-                                                  ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                worker[index]['worker_name'],
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 18,
                                                 ),
-                                                worker[index]['avg_rate'] !=
-                                                            null &&
-                                                        worker[index]
-                                                                ['avg_rate'] !=
-                                                            ''
-                                                    ? RatingBarIndicator(
-                                                        rating: double.parse(
-                                                            worker[index][
-                                                                    'avg_rate'] ??
-                                                                "0"),
-                                                        itemBuilder:
-                                                            (context, index) =>
-                                                                Icon(
-                                                          Icons.star,
-                                                          color: Colors.amber,
-                                                        ),
-                                                        itemCount: 5,
-                                                        itemSize: 18.0,
-                                                        direction:
-                                                            Axis.horizontal,
-                                                      )
-                                                    : SizedBox(),
-                                              ],
-                                            ),
-                                            Text(
-                                              worker[index]['service_name'],
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 16,
                                               ),
-                                            ),
-                                            Text(worker[index]['address'],style: TextStyle(
+                                              worker[index]['avg_rate'] != null && worker[index]['avg_rate'] != ''
+                                                  ? RatingBarIndicator(
+                                                rating: double.parse(worker[index]['avg_rate'] ?? "0"),
+                                                itemBuilder: (context, index) => Icon(
+                                                  Icons.star,
+                                                  color: Colors.amber,
+                                                ),
+                                                itemCount: 5,
+                                                itemSize: 18.0,
+                                                direction: Axis.horizontal,
+                                              )
+                                                  : SizedBox(),
+                                            ],
+                                          ),
+                                          Text(
+                                            worker[index]['service_name'],
+                                            style: TextStyle(
                                               color: Colors.grey,
                                               fontWeight: FontWeight.w400,
                                               fontSize: 16,
-                                            ),),
-                                            SizedBox(height: 10),
-                                          ],
-                                        ),
+                                            ),
+                                          ),
+                                          Text(
+                                            worker[index]['address'],
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          ),
+                        );
+                      },
+                    )
                 ),
               ],
             )

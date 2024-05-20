@@ -9,6 +9,8 @@ import 'homePage.dart';
 import 'search.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'workerProfile.dart';
+import 'customerCommunication.dart';
+import 'workerCommunication.dart';
 class Home extends StatefulWidget {
   // int? neededPage;
   // List<int>? selectedId;
@@ -73,7 +75,7 @@ class _HomeState extends State<Home> {
       // SearchPage(services_id: widget.selectedId,) :
       SearchPage(),
       // third item
-      isLoggedIn? Text('Chat Page',style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)): LoginOrSignup(loadDataCallback: loadData,),
+      isLoggedIn ? (acc_type == 'client' || acc_type == "customer" ? CustomerCommunicationPage() : WorkerCommunicationPage()) : LoginOrSignup(loadDataCallback: loadData,),
       // fourth item
       isLoggedIn ? (acc_type=='client' || acc_type=="customer"? CustomerProfile() : WorkerProfile()) : LoginOrSignup(loadDataCallback: loadData,),
     ];
