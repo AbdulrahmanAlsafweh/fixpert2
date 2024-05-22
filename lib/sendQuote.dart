@@ -24,6 +24,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
 
   String? customer_id='';
   String? customer_name='';
+  bool fastFixing = false;
   void _sendAppointmentRequest() {
     String address = addressController.text.trim();
     String description = descriptionController.text.trim();
@@ -58,8 +59,8 @@ print(city);
       print("not null");
       print(_imageFiles);
 
-
-      var url = Uri.parse("https://switch.unotelecom.com/fixpert/sendQuote.php?worker_id=${widget.worker_id}&worker_name=${widget.worker_name}&customer_id=$customer_id&customer_name=$customer_name&customer_city=$city&quote_details=$description&customer_state=$state&customer_block=$block&customer_address=$address&customer_phone_number=$phoneNumber");
+      String type = fastFixing? "fast fixing" : "get a quote";
+      var url = Uri.parse("https://switch.unotelecom.com/fixpert/sendQuote.php?worker_id=${widget.worker_id}&worker_name=${widget.worker_name}&customer_id=$customer_id&customer_name=$customer_name&customer_city=$city&quote_details=$description&customer_state=$state&customer_block=$block&customer_address=$address&customer_phone_number=$phoneNumber&type=$type");
 
 
       print(url);
@@ -99,7 +100,9 @@ print(city);
 
     }
     else{
-      var url = Uri.parse("https://switch.unotelecom.com/fixpert/sendQuote.php?worker_id=${widget.worker_id}&worker_name=${widget.worker_name}&customer_id=$customer_id&customer_name=$customer_name&customer_city=$city&quote_details=$description&customer_state=$state&customer_block=$block&customer_address=$address&customer_phone_number=$phoneNumber");
+
+      String type = fastFixing? "fast fixing" : "get a quote";
+      var url = Uri.parse("https://switch.unotelecom.com/fixpert/sendQuote.php?worker_id=${widget.worker_id}&worker_name=${widget.worker_name}&customer_id=$customer_id&customer_name=$customer_name&customer_city=$city&quote_details=$description&customer_state=$state&customer_block=$block&customer_address=$address&customer_phone_number=$phoneNumber&type=$type");
       print(url);
       final request = await http.get(url);
       if(request.statusCode == 200){
@@ -161,7 +164,7 @@ print(city);
         child: Icon(Icons.send),
       ),
       appBar: AppBar(
-        title: Text('Request Appointment'),
+        title: Text('Get a quote or fast fix'),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20.0),
@@ -220,6 +223,15 @@ print(city);
               initialCountryCode: 'LB',
               onChanged: (phone) {
                 print(phone.completeNumber);
+              },
+            ),
+            CheckboxListTile(
+              title: Text("Fast Fixing"), // Checkbox label
+              value: fastFixing,
+              onChanged: (value) {
+                setState(() {
+                  fastFixing = value!;
+                });
               },
             ),
             Text(

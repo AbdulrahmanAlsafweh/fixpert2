@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 class ChangeOpenTimePage extends StatefulWidget {
   const ChangeOpenTimePage({Key? key}) : super(key: key);
 
@@ -27,8 +28,11 @@ class _ChangeOpenTimePageState extends State<ChangeOpenTimePage> {
     final request = await http.get(Uri.parse(url));
     if (request.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Time updated!")));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to update time.")));
     }
   }
+
   String _formatTime(TimeOfDay timeOfDay) {
     String period = timeOfDay.period == DayPeriod.am ? 'AM' : 'PM';
     int hour = timeOfDay.hourOfPeriod == 0 ? 12 : timeOfDay.hourOfPeriod;
@@ -36,6 +40,7 @@ class _ChangeOpenTimePageState extends State<ChangeOpenTimePage> {
     String minuteStr = timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : '${timeOfDay.minute}';
     return '$hourStr:$minuteStr $period';
   }
+
   Future<void> selectOpenTime() async {
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
@@ -65,47 +70,61 @@ class _ChangeOpenTimePageState extends State<ChangeOpenTimePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Change Open and Close Time'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ElevatedButton.icon(
               onPressed: selectOpenTime,
               icon: Icon(Icons.access_time),
               label: Text('Select Open Time'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+              ),
             ),
             SizedBox(height: 20),
             Text(
               'Selected Open Time: ${_formatTime(openTime)}',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: selectCloseTime,
               icon: Icon(Icons.access_time),
               label: Text('Select Close Time'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+              ),
             ),
             SizedBox(height: 20),
             Text(
               'Selected Close Time: ${_formatTime(closeTime)}',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
             ),
-            ElevatedButton(onPressed: () {
-              updateOpenCloseTime();
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Home(neededPage: 3,),));
-            }, child: Text("update"))
+            SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () {
+                updateOpenCloseTime();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => Home(neededPage: 3),
+                  ),
+                );
+              },
+              child: Text('Update'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-
-//   String _formatTime(TimeOfDay timeOfDay) {
-//     final now = DateTime.now();
-//     final time = DateTime(now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
-//     return DateFormat.jm().format(time);
-//   }
 }

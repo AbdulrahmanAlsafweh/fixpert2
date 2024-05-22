@@ -130,9 +130,9 @@ class _CustomerProfileState extends State<CustomerProfile> {
           isDraggable: true,
           slideDirection: SlideDirection.RIGHT_TO_LEFT,
           appBar: SliderAppBar(
-              appBarColor: Colors.white,
+              appBarColor: Colors.indigoAccent,
               title: Text('Profile',
-                  style: const TextStyle(
+                  style: const TextStyle(color: Colors.white,
                       fontSize: 22, fontWeight: FontWeight.w700))),
           slider: Scaffold(
             appBar: AppBar(),
@@ -224,26 +224,26 @@ class _CustomerProfileState extends State<CustomerProfile> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Address: $address ',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      ChooseLocationPage(),
-                                ));
-                              },
-                              icon: Icon(Icons.edit),
-                            )
-                          ],
-                        ),
+                        // Row(
+                        //   children: [
+                        //     Text(
+                        //       'Address: $address ',
+                        //       style: TextStyle(
+                        //           fontSize: 16,
+                        //           fontWeight: FontWeight.w500),
+                        //     ),
+                        //     IconButton(
+                        //       onPressed: () {
+                        //         Navigator.of(context)
+                        //             .push(MaterialPageRoute(
+                        //           builder: (context) =>
+                        //               ChooseLocationPage(),
+                        //         ));
+                        //       },
+                        //       icon: Icon(Icons.edit),
+                        //     )
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),

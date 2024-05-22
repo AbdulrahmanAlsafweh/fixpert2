@@ -403,7 +403,7 @@ bool? isLoggedIn ;
                                 FadeTransition(
                                   opacity: _animation,
                                   child: Text(
-                                    'Slide to right',
+                                    'Slide to get quote or fast fix',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -477,13 +477,15 @@ bool? isLoggedIn ;
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
+                                              Expanded(child:Text(
                                                 worker[index]['worker_name'],
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w700,
                                                   fontSize: 18,
                                                 ),
-                                              ),
+                                              ) )
+                                              ,
                                               worker[index]['avg_rate'] != null && worker[index]['avg_rate'] != ''
                                                   ? RatingBarIndicator(
                                                 rating: double.parse(worker[index]['avg_rate'] ?? "0"),

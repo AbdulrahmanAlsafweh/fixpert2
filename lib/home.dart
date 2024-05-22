@@ -105,8 +105,8 @@ class _HomeState extends State<Home> {
                       ),
                       BottomNavigationBarItem(
                         icon: Image.asset('assets/chat.png', width: 24, height: 24),
-                        label: ('Chat'),
-                        tooltip: ('Chat'),
+                        label: ('Communications'),
+                        tooltip: ('Communications'),
                         backgroundColor: Colors.white,
                       ),
                       BottomNavigationBarItem(

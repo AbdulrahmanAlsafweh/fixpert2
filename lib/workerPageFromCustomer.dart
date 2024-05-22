@@ -167,7 +167,15 @@ class _WorkerPageByOthersState extends State<WorkerPageByOthers> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: Colors.white), // Change the color here
+    onPressed: () {
+    Navigator.of(context).pop();
+    },),
+        backgroundColor: availability == null ? Colors.white :( availability == "1" ?Colors.green : Colors.red ),
+        title: workerName != null ? Text(workerName!,style: TextStyle(color: Colors.white),) : Text("worker name",style: TextStyle(color: Colors.white),)
+      ),
       body: loading
           ? Center(
           child: LoadingAnimationWidget.inkDrop(

@@ -18,10 +18,10 @@ class _EditCustomerProfileState extends State<EditCustomerProfile> {
 
 
   TextEditingController usernameController=TextEditingController();
-  TextEditingController addressController=TextEditingController();
+  // TextEditingController addressController=TextEditingController();
   String user_id="";
   String username="";
-  String address='';
+  // String address='';
   Future<void> _getImage(String userId) async {
     final picker = ImagePicker();
   print('i clicked on picker');
@@ -64,15 +64,13 @@ class _EditCustomerProfileState extends State<EditCustomerProfile> {
       ),
     );
   }
-  Future<void> updateChanges(String newUsername, String newAddress) async {
+  Future<void> updateChanges(String newUsername) async {
     String url = 'https://switch.unotelecom.com/fixpert/updateCustomerInfo.php';
     SharedPreferences sp = await SharedPreferences.getInstance();
 
-    if (newAddress.isNotEmpty) {
-      url += "?new_address=$newAddress&user_id=$user_id";
-    } else {
+
       url += "?user_id=$user_id";
-    }
+
     if (newUsername.isNotEmpty) {
       url += "&new_username=$newUsername";
     }
@@ -81,14 +79,14 @@ class _EditCustomerProfileState extends State<EditCustomerProfile> {
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(jsonDecode(response.body)['message'])));
-      sp.setString('address', newAddress);
+      // sp.setString('address', newAddress);
       sp.setString('username', newUsername);
       print("the new username is $newUsername");
       Map<String,dynamic> result=jsonDecode(response.body);
       print(result['message']);
       print(url);
       _fetchInitialValues();
-      print(address);
+      // print(address);
     }
   }
   @override
@@ -106,9 +104,9 @@ class _EditCustomerProfileState extends State<EditCustomerProfile> {
         print('the username is ${sp.getString('username')}');
       usernameController.text = sp.getString('username')!;
       user_id=sp.getString('user_id')!;
-      address=sp.getString('address')!;
+      // address=sp.getString('address')!;
       username=sp.getString('username')!;
-      addressController.text = sp.getString("address")!;
+      // addressController.text = sp.getString("address")!;
     });
   }
   @override
@@ -136,7 +134,7 @@ class _EditCustomerProfileState extends State<EditCustomerProfile> {
           ),),
           actions: [
             TextButton(onPressed: () {
-              updateChanges(usernameController.text.trim(), addressController.text.trim());
+              updateChanges(usernameController.text.trim());
 
               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) =>Home() ,));
             }, child: Text(
@@ -178,14 +176,14 @@ class _EditCustomerProfileState extends State<EditCustomerProfile> {
             SizedBox(height: 10,),
 
             // This field is to change the address
-            Padding(padding: EdgeInsets.only(left: 10,right: 10),child:TextField(
-              controller: addressController,
-              decoration: InputDecoration(
-
-                  labelText: 'Address',
-
-              ),
-            ) ,),
+            // Padding(padding: EdgeInsets.only(left: 10,right: 10),child:TextField(
+            //   controller: addressController,
+            //   decoration: InputDecoration(
+            //
+            //       labelText: 'Address',
+            //
+            //   ),
+            // ) ,),
 
           ],
         ),

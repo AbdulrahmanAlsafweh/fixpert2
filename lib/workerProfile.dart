@@ -245,8 +245,6 @@ class _WorkerProfileState extends State<WorkerProfile> {
     }
   }
 
-
-
   Future<void> getWorkerProjects(int? id) async {
     String url =
         "https://switch.unotelecom.com/fixpert/getWorkerProjects.php?user_id=$id";
@@ -304,9 +302,10 @@ class _WorkerProfileState extends State<WorkerProfile> {
               isDraggable: true,
               slideDirection: SlideDirection.RIGHT_TO_LEFT,
               appBar: SliderAppBar(
-                  appBarColor: Colors.white,
-                  title: Text('Worker Page',
+                  appBarColor: availability != null ? (availability == 1 ? Colors.green : Colors.red) : Colors.white,
+                  title: Text('Profile',
                       style: const TextStyle(
+                        color: Colors.white,
                           fontSize: 22, fontWeight: FontWeight.w700))),
               slider: Scaffold(
                 appBar: AppBar(),
@@ -320,10 +319,10 @@ class _WorkerProfileState extends State<WorkerProfile> {
                             builder: (context) => EditWorkerProfile(),
                             settings: RouteSettings(arguments: {
                               'uri':
-                              "https://switch.unotelecom.com/fixpert/assets/$picUri",
+                                  "https://switch.unotelecom.com/fixpert/assets/$picUri",
                               'username': username,
                               'user_id': id,
-                              'about' :about
+                              'about': about
                             })));
                       },
                       child: ListTile(
@@ -374,8 +373,7 @@ class _WorkerProfileState extends State<WorkerProfile> {
                         onLongPress: () {
                           updateAvailability(availability == 1 ? 0 : 1);
                         },
-                        child:
-                        Container(
+                        child: Container(
                           width: double.infinity,
                           height: screenHeight * 0.3,
                           color: availability == 1 ? Colors.green : Colors.red,
@@ -409,7 +407,9 @@ class _WorkerProfileState extends State<WorkerProfile> {
                               children: [
                                 Text(
                                   'Address: $address ',
-                                  style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
                                 IconButton(
                                   onPressed: () {
@@ -435,7 +435,9 @@ class _WorkerProfileState extends State<WorkerProfile> {
                                 children: [
                                   Text(
                                     'Work time: $open_time-$close_time',
-                                    style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                   Icon(Icons.edit),
                                 ],
@@ -469,7 +471,9 @@ class _WorkerProfileState extends State<WorkerProfile> {
                               ),
 
                             Text(about, style: TextStyle(fontSize: 16)),
-                            SizedBox(height: 10,),
+                            SizedBox(
+                              height: 10,
+                            ),
                             Text(
                               'Projects',
                               style: TextStyle(
@@ -483,12 +487,16 @@ class _WorkerProfileState extends State<WorkerProfile> {
                               ),
                             ),
                             SizedBox(height: 5),
-                            projectsWithImages.isEmpty ? SizedBox(height: 0,width: 0,):
-                            Text(
-                              'Long press on a project to delete it.',
-                              style: TextStyle(
-                                  fontSize: 14, color: Colors.grey[600]),
-                            ),
+                            projectsWithImages.isEmpty
+                                ? SizedBox(
+                                    height: 0,
+                                    width: 0,
+                                  )
+                                : Text(
+                                    'Long press on a project to delete it.',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey[600]),
+                                  ),
                             SizedBox(height: 5),
                             projectsWithImages.isNotEmpty
                                 ? GridView.builder(
@@ -556,14 +564,14 @@ class _WorkerProfileState extends State<WorkerProfile> {
                                       );
                                     },
                                   )
-                                :    Text(
-                              "No projects available",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey,
-                              ),
-                            ),
+                                : Text(
+                                    "No projects available",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
 
                             Padding(
                               padding: EdgeInsets.only(left: 0),

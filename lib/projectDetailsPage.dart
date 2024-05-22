@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -11,15 +10,17 @@ class ProjectDetailsPage extends StatefulWidget {
   final List<String> images;
   final String? worker_id;
 
-  ProjectDetailsPage(
-      {required this.projectName, required this.images, this.worker_id});
+  ProjectDetailsPage({
+    required this.projectName,
+    required this.images,
+    this.worker_id,
+  });
 
   @override
   _ProjectDetailsPageState createState() => _ProjectDetailsPageState();
 }
 
 class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
-
   late String projectDetails;
   bool isLoadingDetails = false;
 
@@ -27,7 +28,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   void initState() {
     super.initState();
     getProjectDetails();
-    projectDetails = ''; // Initialize projectDetails
+    projectDetails = '';
   }
 
   Future<void> getProjectDetails() async {
@@ -35,13 +36,14 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
       isLoadingDetails = true;
     });
 
-    String url = "https://switch.unotelecom.com/fixpert/getProjectDetails.php?worker_id=${widget.worker_id}&project_name=${widget.projectName}";
+    String url =
+        "https://switch.unotelecom.com/fixpert/getProjectDetails.php?worker_id=${widget.worker_id}&project_name=${widget.projectName}";
     print("fetching $url");
     final request = await http.get(Uri.parse(url));
     if (request.statusCode == 200) {
       setState(() {
-        Map<String,dynamic> data = jsonDecode(request.body);
-        projectDetails=data["details"];
+        Map<String, dynamic> data = jsonDecode(request.body);
+        projectDetails = data["details"];
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -77,70 +79,78 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: isLoadingDetails
-                ? CircularProgressIndicator() // Show loading indicator
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            isLoadingDetails
+                ? Center(
+              child: LoadingAnimationWidget.staggeredDotsWave(
+                color: Colors.blueAccent,
+                size: 50,
+              ),
+            )
                 : Text(
-              projectDetails.isNotEmpty ? projectDetails : 'No details available',
+              projectDetails.isNotEmpty
+                  ? projectDetails
+                  : 'No details available',
               style: TextStyle(fontSize: 16),
             ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                childAspectRatio: 1.0,
-              ),
-              itemCount: widget.images.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ImageViewerPage(
+            SizedBox(height: 16),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 8.0,
+                  crossAxisSpacing: 8.0,
+                  childAspectRatio: 1.0,
+                ),
+                itemCount: widget.images.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ImageViewerPage(
+                            imageUrl:
+                            "https://switch.unotelecom.com/fixpert/assets/worker_projects/${widget.images[index]}",
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: CachedNetworkImage(
                           imageUrl:
                           "https://switch.unotelecom.com/fixpert/assets/worker_projects/${widget.images[index]}",
+                          placeholder: (context, url) => Center(
+                            child: LoadingAnimationWidget.staggeredDotsWave(
+                              color: Colors.blueAccent,
+                              size: 50,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Center(
+                            child: Icon(
+                              Icons.error,
+                              color: Colors.red,
+                              size: 50,
+                            ),
+                          ),
+                          fit: BoxFit.cover,
                         ),
                       ),
-                    );
-                  },
-                  child: Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: CachedNetworkImage(
-                        imageUrl:
-                        "https://switch.unotelecom.com/fixpert/assets/worker_projects/${widget.images[index]}",
-                        placeholder: (context, url) => Center(
-                          child: LoadingAnimationWidget.prograssiveDots(
-                            color: Colors.blueAccent,
-                            size: 50,
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Center(
-                          child: Icon(
-                            Icons.error,
-                            color: Colors.red,
-                            size: 50,
-                          ),
-                        ),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

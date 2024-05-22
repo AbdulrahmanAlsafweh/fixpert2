@@ -51,6 +51,13 @@ class _WorkerCommunicationPageState extends State<WorkerCommunicationPage> {
           'block' :item['customer_block'],
           'address' :item['customer_address'],
           'details' :item['customer_description'],
+          'offerd_date':item['offerd_date'] ?? "",
+          'appro_price' : item['approximated_price'] ,
+          'type':item['type'],
+          'note' : item['worker_note'] ?? "no note",
+          'customer_phone_number' : item['customer_number'] ,
+          'worker_phone_number' : item['worker_phone_number'] ,
+
           // 'communication_type': item['communication_type'],
         });
       }
@@ -90,37 +97,79 @@ class _WorkerCommunicationPageState extends State<WorkerCommunicationPage> {
             child: Text('Communications'),
           ) ,
         ),
-        body: communications.length >0 ? ListView.builder(
+        body: communications.isNotEmpty
+            ? ListView.builder(
           itemCount: communications.length,
           itemBuilder: (context, index) {
-            bool isRejected = communications[index]['status']!.contains('Rejected !');
-            return GestureDetector(
-              onLongPress: () {
-                deleteQuote(index);
-              },
-              onTap: () {
-Navigator.of(context).push(MaterialPageRoute(builder: (context) => ReplyQuotePage(communications: communications,index:index),));
-              },
-              child: Card(
+            bool isRejected =
+            communications[index]['status']!.contains('Rejected !');
+            bool isDone = communications[index]['status']!.contains('Done');
+            return InkWell(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ReplyQuotePage(
+                      communications: communications,
+                      index: index,
+                    ),
+                  ));
+                },
+                onLongPress: () {
+                  deleteQuote(index);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Type: ${communications[index]['type']}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Clien Name: ${communications[index]['client_name']}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Communication ID: ${communications[index]['communication_id']}',
+                      ),
+                      SizedBox(height: 8),
+                      // Text(
+                      //   'Address: ${communications[index]['address']}',
+                      // ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Status: ${communications[index]['status']}',
+                        style: TextStyle(
+                          color: isRejected
+                              ? Colors.red
+                              : (isDone ? Colors.green : Colors.black),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          deleteQuote(index);
+                        },
+                      ),
+                      Divider(),
 
-                color: isRejected? Colors.red : Colors.grey[200] ,
-                margin: EdgeInsets.all(8.0),
+                    ],
 
-                child:  ListTile(
-
-                  title: Text(
-                      'client Name: ${communications[index]['client_name']}'),
-                  subtitle: Text(
-                      'Communication ID: ${communications[index]['communication_id']}'),
-                  trailing: Text(
-                      'status: ${communications[index]['status']}'),
-                ),
-              ),
-            ) ;
+                  ),
+                )
+            );
           },
-        ) : Center(
-          child: Text("No Communications yet!",style: TextStyle(color: Colors.red,fontSize: 18),),
         )
+            : Center(
+          child: Text(
+            "No Communications yet!",
+            style: TextStyle(color: Colors.red, fontSize: 18),
+          ),
+        ),
     );
   }
 }

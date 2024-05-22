@@ -1,3 +1,4 @@
+import 'package:fixpert/workerPageFromCustomer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -51,7 +52,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -78,8 +78,10 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 20),
+            // projects.isNotEmpty ? Text("Our Best Team’s Project This Day",textAlign: TextAlign.start,style: TextStyle(fontSize: ),):SizedBox(height: 0,),
             projects.isNotEmpty
                 ? CarouselSlider(
+
               options: CarouselOptions(
                 height: 400.0,
                 autoPlay: true,
@@ -87,6 +89,7 @@ class _HomePageState extends State<HomePage> {
                 enlargeCenterPage: true,
               ),
               items: projects.map((i) {
+
                 return Builder(
                   builder: (BuildContext context) {
                     return Container(
@@ -105,30 +108,43 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: CachedNetworkImage(
-                          imageUrl: "https://switch.unotelecom.com/fixpert/assets/worker_projects/${i['image']}",
-                          placeholder: (context, url) => Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Opacity(
-                                opacity: 0.7,
-                                child: Image.asset(
-                                  "assets/logo.png",
-                                  width: 1000,
-                                  height: 2000,
-                                  fit: BoxFit.cover,
+                        child:
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => WorkerPageByOthers(
+                                id: int.parse(i['worker_id']),
+                                rate: double.parse(i['average_rate'] ?? "0")  ,
+                                serviceByWorker: i['service_id'],
+                              ),
+                            ));
+                          },
+                          child: CachedNetworkImage(
+                            imageUrl: "https://switch.unotelecom.com/fixpert/assets/worker_projects/${i['image']}",
+                            placeholder: (context, url) => Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Opacity(
+                                  opacity: 0.7,
+                                  child: Image.asset(
+                                    "assets/logo.png",
+                                    width: 1000,
+                                    height: 2000,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                              LoadingAnimationWidget.prograssiveDots(
-                                color: Colors.blueAccent,
-                                size: 50,
-                              ),
-                            ],
+                                LoadingAnimationWidget.prograssiveDots(
+                                  color: Colors.blueAccent,
+                                  size: 50,
+                                ),
+                              ],
+                            ),
+                            errorWidget: (context, url, error) => Icon(Icons.error),
+                            width: 1000,
+                            fit: BoxFit.cover,
                           ),
-                          errorWidget: (context, url, error) => Icon(Icons.error),
-                          width: 1000,
-                          fit: BoxFit.cover,
                         ),
+
                       ),
                     );
                   },
@@ -276,6 +292,7 @@ class _HomePageState extends State<HomePage> {
               ),
             )
                 : LoadingAnimationWidget.fourRotatingDots(color: Colors.blueAccent, size: 50.0),
+
             SizedBox(height: 30),
             Stack(
               children: [
