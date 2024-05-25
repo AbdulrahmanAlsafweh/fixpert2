@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
 import 'ChooseTheAccountType.dart';
-import 'signup.dart';
-import 'getServices.dart';
 import 'customerProfile.dart';
-import 'profile.dart';
 import 'homePage.dart';
 import 'search.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,9 +9,7 @@ import 'workerProfile.dart';
 import 'customerCommunication.dart';
 import 'workerCommunication.dart';
 class Home extends StatefulWidget {
-  // int? neededPage;
-  // List<int>? selectedId;
-    int? neededPage;
+  int? neededPage;
   Home({Key? key ,this.neededPage}) : super(key: key);
 
   @override
@@ -46,7 +41,6 @@ class _HomeState extends State<Home> {
 
 
   @override
-  @override
   void initState() {
     super.initState();
     loadData();
@@ -56,13 +50,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-
-
-  // void updateLoggedInStatus(bool status) {
-  //   setState(() {
-  //     isLoggedIn = status;
-  //   });
-  // }
   @override
   Widget build(BuildContext context) {
     // the list to disply the selected widget
@@ -71,8 +58,6 @@ class _HomeState extends State<Home> {
       // first item
       HomePage(),
       // second item
-      // widget.selectedId!.isNotEmpty ?
-      // SearchPage(services_id: widget.selectedId,) :
       SearchPage(),
       // third item
       isLoggedIn ? (acc_type == 'client' || acc_type == "customer" ? CustomerCommunicationPage() : WorkerCommunicationPage()) : LoginOrSignup(loadDataCallback: loadData,),

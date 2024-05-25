@@ -1,33 +1,41 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'home.dart';
 import 'splashScreen.dart';
-import 'homePage.dart';
 import 'OnBoarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure that Flutter has initialized
-  // await checkLandingFlag(); // Await the function call here
-  runApp(const MyApp());
-}
-
-bool landingFlag =false;
-Future<void> checkLandingFlag() async {
-  SharedPreferences sp = await SharedPreferences.getInstance();
-  landingFlag = sp.getBool('landingFlag') ?? true; // Use null-aware operator
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key); // Fix the constructor
+  const MyApp({Key? key}) : super(key: key);
+
+  Future<bool> checkLandingFlag() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    return sp.getBool('landingFlag') ?? true;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-
-      home: Scaffold(
-        body:  landingFlag? OnBoarding() : SplashScreen() , // Use null assertion operator
-      ),
+    return FutureBuilder<bool>(
+      future: checkLandingFlag(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        } else {
+          bool landingFlag = snapshot.data ?? true;
+          return MaterialApp(
+            home: Scaffold(
+              body: landingFlag ? OnBoarding() : SplashScreen(),
+            ),
+          );
+        }
+      },
     );
   }
 }

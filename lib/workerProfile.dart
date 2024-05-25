@@ -405,12 +405,13 @@ class _WorkerProfileState extends State<WorkerProfile> {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                Expanded(child:Text(
                                   'Address: $address ',
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500),
-                                ),
+                                ), ),
+
                                 IconButton(
                                   onPressed: () {
                                     Navigator.of(context)
@@ -731,7 +732,7 @@ class _WorkerProfileState extends State<WorkerProfile> {
               ),
             )
           : Center(
-              child: LoadingAnimationWidget.staggeredDotsWave(
+              child: LoadingAnimationWidget.inkDrop(
                 color: Colors.blue,
                 size: 50,
               ),

@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'package:fixpert/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'login.dart';
-import 'home.dart';
 import 'getServices.dart';
 import 'chooseLocation.php.dart';
 class Signup extends StatelessWidget {
@@ -86,7 +86,7 @@ class Signup extends StatelessWidget {
             Navigator.of(context).popUntil((route) => route.isFirst);
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => ChooseLocationPage()),
+              MaterialPageRoute(builder: (context) => Home(neededPage: 0,)),
             );
           } else {
             sp.setBool("loggedIn", false);
@@ -181,6 +181,7 @@ class Signup extends StatelessWidget {
                 width: screenWidth - (screenWidth * 0.05),
                 // margin: EdgeInsets.symmetric(horizontal: 20.0),
                 child: TextField(
+
                   controller: emailController,
                   decoration: InputDecoration(
                       filled: true,

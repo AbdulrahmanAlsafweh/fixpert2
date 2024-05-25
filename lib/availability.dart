@@ -68,8 +68,8 @@ class _AvailabilityState extends State<Availability> {
                     child:
                     ElevatedButton(onPressed:() {
                       updateAvailability(0);
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChooseLocationPage(),));},
+                      // Navigator.of(context).popUntil((route) => route.isFirst);
+                     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ChooseLocationPage(),));},
                         child: Text(
                             "Not Now"
                         ),style: ButtonStyle(
@@ -85,8 +85,8 @@ class _AvailabilityState extends State<Availability> {
               height: 70,
               child:   ElevatedButton(onPressed:() {
                 updateAvailability(1);
-                Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChooseLocationPage(),));
+                // Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ChooseLocationPage(),));
               },
                 child:
                 Row(
